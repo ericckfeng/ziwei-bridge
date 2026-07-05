@@ -88,6 +88,7 @@ footer{text-align:center;color:var(--dim);font-size:12px;padding:0 20px 36px;let
 
     <div class="ctlrow sep">
       <label>局數</label><select id="tableSel"></select>
+      <label>循環</label><select id="cycleSel"></select>
       <button id="prevBtn">◀</button><button id="nextBtn">▶</button>
       <button id="playBtn">▶ 自動運行</button>
       <label>停留 <span id="secLabel">3</span> 秒</label>
@@ -127,7 +128,7 @@ footer{text-align:center;color:var(--dim);font-size:12px;padding:0 20px 36px;let
     <div class="card">
       <h2>使用方法</h2>
       <ul>
-        <li>選「局數」跳至任一表，或按「自動運行」由表一至表十二循環旋轉。</li>
+        <li>「循環」選單決定 ◀▶ 與「自動運行」作用的參數（局數／年干／年支／生月／生時）；按「自動運行」即以停留秒數自動循環該參數，所有變化皆以動畫平滑過渡。</li>
         <li>年干／年支／生月／生時四個參數驅動四化與吉煞星：主盤旋轉時，<b>吉煞星固定不動</b>——它們錨定於出生四柱，不隨局數變化。</li>
         <li>各勾選框可分層開關線條與符號，便於單獨觀察。</li>
       </ul>
@@ -518,22 +519,38 @@ function goTo(target){
 function schedule(){
   clearTimeout(playTimer);
   if(!playing) return;
-  playTimer = setTimeout(()=>{ goTo(current+1); schedule(); }, +speed.value*1000);
+  playTimer = setTimeout(()=>{ stepCycle(1); schedule(); }, +speed.value*1000);
 }
 
 /* 控制元件 */
 const tableSel=document.getElementById("tableSel"), ganSel=document.getElementById("ganSel"),
       zhiSel=document.getElementById("zhiSel"), monSel=document.getElementById("monSel"),
       hourSel=document.getElementById("hourSel"), speed=document.getElementById("speed");
+const cycleSel = document.getElementById("cycleSel");
 TABLE_NAMES.forEach((n,i)=>{const o=document.createElement("option");o.value=i;o.textContent=`${n} 紫微在${BR[i]}`;tableSel.appendChild(o);});
 GAN.forEach((g,i)=>{const o=document.createElement("option");o.value=i;o.textContent=g;ganSel.appendChild(o);});
 BR.forEach((b,i)=>{const o=document.createElement("option");o.value=i;o.textContent=b;zhiSel.appendChild(o);});
 for(let m=1;m<=12;m++){const o=document.createElement("option");o.value=m;o.textContent=m+"月";monSel.appendChild(o);}
 BR.forEach((b,i)=>{const o=document.createElement("option");o.value=i;o.textContent=b+"時";hourSel.appendChild(o);});
+const CYCLE = [
+  {label:"局數"},
+  {label:"年干", sel:ganSel,  n:10, min:0},
+  {label:"年支", sel:zhiSel,  n:12, min:0},
+  {label:"生月", sel:monSel,  n:12, min:1},
+  {label:"生時", sel:hourSel, n:12, min:0}
+];
+CYCLE.forEach((c,i)=>{ const o=document.createElement("option"); o.value=i; o.textContent=c.label; cycleSel.appendChild(o); });
+function stepCycle(dir){
+  const c = CYCLE[+cycleSel.value];
+  if(!c.sel){ goTo(current+dir); return; }
+  const v = +c.sel.value - c.min;
+  c.sel.value = c.min + ((v + dir) % c.n + c.n) % c.n;
+  onParamChange();
+}
 
 tableSel.addEventListener("change",e=>goTo(+e.target.value));
-document.getElementById("prevBtn").addEventListener("click",()=>goTo(current-1));
-document.getElementById("nextBtn").addEventListener("click",()=>goTo(current+1));
+document.getElementById("prevBtn").addEventListener("click",()=>stepCycle(-1));
+document.getElementById("nextBtn").addEventListener("click",()=>stepCycle(1));
 speed.addEventListener("input",e=>{document.getElementById("secLabel").textContent=e.target.value;if(playing)schedule();});
 document.getElementById("playBtn").addEventListener("click",function(){
   playing=!playing;
