@@ -13,7 +13,7 @@
   --zw-sanhe:#e8483c; --zw-dui:#f2913d;
   --tf-sanhe:#3fae6f; --tf-dui:#0abab5;
   --anhe:#a78bfa; --cross:#6b7390;
-  --yang:#f2913d; --yin:#4f7cd9;
+  --yang:#f2913d; --yin:#3f6ad4;
   --ji:#e3c35e;   /* 六吉+祿存 */
   --sha:#c05a6a;  /* 六煞 */
   --hua-lu:#4cc27a; --hua-quan:#e05353; --hua-ke:#5b9df0; --hua-ji:#8d8d99;
@@ -248,12 +248,12 @@ function el(tag, attrs, parent){
     const p3=[CX+R_WOUT*Math.sin(a2),CY-R_WOUT*Math.cos(a2)];
     const p4=[CX+R_WIN*Math.sin(a2),CY-R_WIN*Math.cos(a2)];
     el("path",{d:`M${p1} L${p2} A${R_WOUT},${R_WOUT} 0 0 1 ${p3} L${p4} A${R_WIN},${R_WIN} 0 0 0 ${p1} Z`,
-      fill:i%2===0?"var(--yang)":"var(--yin)",opacity:.08,
-      stroke:"rgba(217,180,91,.15)","stroke-width":.6}, g);
+      fill:i%2===0?"var(--yang)":"var(--yin)",opacity:.16,
+      stroke:"rgba(217,180,91,.4)","stroke-width":1.2}, g);
     const [lx,ly]=pt(i,R_BR);
     el("text",{x:lx,y:ly,"text-anchor":"middle","dominant-baseline":"central",
       fill:i%2===0?"var(--yang)":"var(--yin)","font-size":17,
-      "font-family":"'Noto Serif TC',serif","font-weight":600,opacity:.9},g)
+      "font-family":"'Noto Serif TC',serif","font-weight":600,opacity:1},g)
       .textContent = BR[i]+(i%2===0?"⁺":"⁻");
   }
   el("circle",{cx:CX,cy:CY,r:R_ZW,fill:"none",stroke:"rgba(217,180,91,.13)","stroke-width":.7});
