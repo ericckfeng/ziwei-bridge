@@ -408,11 +408,33 @@ function drawAux(state){
   }
 }
 function currentParams(){ return [GAN[+ganSel.value], +zhiSel.value, +monSel.value, +hourSel.value]; }
+let paramAnimId = null;
 function onParamChange(){
-  auxState = auxRenderState(...currentParams());
-  drawAux(auxState);
+  const target = auxRenderState(...currentParams());
+  if(paramAnimId){ cancelAnimationFrame(paramAnimId); paramAnimId = null; }
   draw(current,true);
-  renderPanel(current);
+  if(reduceMotion || !auxState){
+    auxState = target; drawAux(auxState); renderPanel(current); return;
+  }
+  const tw = {};
+  for(const name in target){
+    const s = auxState[name].deg;
+    let d = target[name].deg - s;
+    while(d > 180) d -= 360;
+    while(d < -180) d += 360;
+    tw[name] = {s, d};
+  }
+  const dur = 700, t0 = performance.now();
+  function step(now){
+    const k = Math.min(1,(now-t0)/dur), e = 1-Math.pow(1-k,3);
+    const st = {};
+    for(const name in target) st[name] = {deg: tw[name].s + tw[name].d*e, k: target[name].k};
+    auxState = st;
+    drawAux(auxState);
+    if(k<1) paramAnimId = requestAnimationFrame(step);
+    else { auxState = target; paramAnimId = null; drawAux(auxState); renderPanel(current); }
+  }
+  paramAnimId = requestAnimationFrame(step);
 }
 
 /* 面板 */
