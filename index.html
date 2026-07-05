@@ -272,6 +272,7 @@ const gAxis = el("g",{});
 const gEdges = el("g",{});
 const gStars = el("g",{});
 const gAux = el("g",{});
+const gFly = el("g",{});
 
 /* 鏡射軸 */
 function drawAxes(){
@@ -330,7 +331,7 @@ function huaMap(){
 function draw(tFloat, showEdges){
   const p = starPos(tFloat);
   gEdges.innerHTML = ""; gStars.innerHTML = "";
-  const hm = document.getElementById("tgHua").checked ? huaMap() : {};
+  const hm = (!huaFlight && document.getElementById("tgHua").checked) ? huaMap() : {};
 
   if(showEdges){
     edgesAt(Math.round(tFloat)).forEach(e=>{
@@ -386,7 +387,7 @@ function drawAux(state){
   const showJi = document.getElementById("tgJi").checked;
   const showSha = document.getElementById("tgSha").checked;
   if(!showJi && !showSha) return;
-  const hm = document.getElementById("tgHua").checked ? huaMap() : {};
+  const hm = (!huaFlight && document.getElementById("tgHua").checked) ? huaMap() : {};
   for(const name in state){
     const {deg, k} = state[name];
     if(k==="ji" && !showJi) continue;
@@ -409,13 +410,46 @@ function drawAux(state){
 }
 function currentParams(){ return [GAN[+ganSel.value], +zhiSel.value, +monSel.value, +hourSel.value]; }
 let paramAnimId = null;
-function onParamChange(){
-  const target = auxRenderState(...currentParams());
-  if(paramAnimId){ cancelAnimationFrame(paramAnimId); paramAnimId = null; }
-  draw(current,true);
-  if(reduceMotion || !auxState){
-    auxState = target; drawAux(auxState); renderPanel(current); return;
+let huaFlight = false, lastGan = "甲";
+function starCoordFor(name, tableIdx, auxSt){
+  if(ZW_OFF.hasOwnProperty(name) || TF_OFF.hasOwnProperty(name)){
+    const p = starPos(tableIdx);
+    return pt(p[name], radiusOf(name));
   }
+  return ptDeg(auxSt[name].deg, R_AUX);
+}
+function renderFly(flights, e){
+  gFly.innerHTML = "";
+  flights.forEach(f=>{
+    const x = f.from[0] + (f.to[0]-f.from[0])*e;
+    const y = f.from[1] + (f.to[1]-f.from[1])*e;
+    el("circle",{cx:x,cy:y,r:8.5,fill:HUA_COLOR[f.i],stroke:"var(--ink)","stroke-width":1.2}, gFly);
+    el("text",{x,y,"text-anchor":"middle","dominant-baseline":"central",
+      fill:"#fff","font-size":10.5}, gFly).textContent = HUA_NAME[f.i];
+  });
+}
+function onParamChange(){
+  const newGan = GAN[+ganSel.value];
+  const target = auxRenderState(...currentParams());
+  const ganChanged = newGan !== lastGan;
+  if(paramAnimId){ cancelAnimationFrame(paramAnimId); paramAnimId = null; }
+  huaFlight = false; gFly.innerHTML = "";
+  if(reduceMotion || !auxState){
+    auxState = target; lastGan = newGan;
+    drawAux(auxState); draw(current,true); renderPanel(current); return;
+  }
+  let flights = null;
+  if(ganChanged && document.getElementById("tgHua").checked){
+    const oldStars = SIHUA[lastGan], newStars = SIHUA[newGan];
+    flights = [0,1,2,3].map(i=>({
+      i,
+      from: starCoordFor(oldStars[i], current, auxState),
+      to:   starCoordFor(newStars[i], current, target)
+    }));
+    huaFlight = true;
+  }
+  lastGan = newGan;
+  draw(current,true);
   const tw = {};
   for(const name in target){
     const s = auxState[name].deg;
@@ -431,8 +465,13 @@ function onParamChange(){
     for(const name in target) st[name] = {deg: tw[name].s + tw[name].d*e, k: target[name].k};
     auxState = st;
     drawAux(auxState);
+    if(flights) renderFly(flights, e);
     if(k<1) paramAnimId = requestAnimationFrame(step);
-    else { auxState = target; paramAnimId = null; drawAux(auxState); renderPanel(current); }
+    else {
+      auxState = target; paramAnimId = null;
+      huaFlight = false; gFly.innerHTML = "";
+      drawAux(auxState); draw(current,true); renderPanel(current);
+    }
   }
   paramAnimId = requestAnimationFrame(step);
 }
