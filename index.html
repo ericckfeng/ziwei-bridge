@@ -365,40 +365,54 @@ function draw(tFloat, showEdges){
   });
 }
 
-/* 吉煞層 (不隨局數旋轉) */
-function drawAux(){
+/* 吉煞層 (不隨局數旋轉)：狀態驅動 */
+function ptDeg(deg, r){
+  const t = (180 + deg) * Math.PI/180;
+  return [CX + r*Math.sin(t), CY - r*Math.cos(t)];
+}
+const SPREAD = [0,-8,8,-16,16,-24,24];
+function auxRenderState(gan, zhi, mon, hour){
+  const ap = auxPos(gan, zhi, mon, hour);
+  const byBranch = {};
+  for(const name in ap) (byBranch[ap[name].p] = byBranch[ap[name].p]||[]).push(name);
+  const st = {};
+  for(const br in byBranch)
+    byBranch[br].forEach((name,j)=>{ st[name] = {deg: 30*(+br) + (SPREAD[j]||0), k: ap[name].k}; });
+  return st;
+}
+let auxState = null;
+function drawAux(state){
   gAux.innerHTML = "";
   const showJi = document.getElementById("tgJi").checked;
   const showSha = document.getElementById("tgSha").checked;
   if(!showJi && !showSha) return;
-  const ap = auxPos(GAN[+ganSel.value], +zhiSel.value, +monSel.value, +hourSel.value);
   const hm = document.getElementById("tgHua").checked ? huaMap() : {};
-  const byBranch = {};
-  for(const name in ap){
-    const {p,k} = ap[name];
+  for(const name in state){
+    const {deg, k} = state[name];
     if(k==="ji" && !showJi) continue;
     if(k==="sha" && !showSha) continue;
-    (byBranch[p] = byBranch[p]||[]).push({name,k});
+    const [x,y] = ptDeg(deg, R_AUX);
+    const col = k==="ji" ? "var(--ji)" : "var(--sha)";
+    const mark = k==="ji" ? "◆" : "▲";
+    const t = el("text",{x,y,"text-anchor":"middle","dominant-baseline":"central",
+      fill:col,"font-size":11.5,"font-family":"'Noto Serif TC',serif","font-weight":600,
+      "paint-order":"stroke",stroke:"var(--ink)","stroke-width":2.5}, gAux);
+    t.textContent = mark + name;
+    if(hm[name]!==undefined){
+      const sp = document.createElementNS(NS,"tspan");
+      sp.setAttribute("fill",HUA_COLOR[hm[name]]);
+      sp.setAttribute("font-size","10");
+      sp.textContent = "·"+HUA_NAME[hm[name]];
+      t.appendChild(sp);
+    }
   }
-  const SPREAD = [0,-8,8,-16,16,-24,24];
-  for(const br in byBranch){
-    byBranch[br].forEach((st,j)=>{
-      const [x,y] = pt(+br, R_AUX, SPREAD[j]||0);
-      const col = st.k==="ji" ? "var(--ji)" : "var(--sha)";
-      const mark = st.k==="ji" ? "◆" : "▲";
-      const t = el("text",{x,y,"text-anchor":"middle","dominant-baseline":"central",
-        fill:col,"font-size":11.5,"font-family":"'Noto Serif TC',serif","font-weight":600,
-        "paint-order":"stroke",stroke:"var(--ink)","stroke-width":2.5}, gAux);
-      t.textContent = mark + st.name;
-      if(hm[st.name]!==undefined){
-        const sp = document.createElementNS(NS,"tspan");
-        sp.setAttribute("fill",HUA_COLOR[hm[st.name]]);
-        sp.setAttribute("font-size","10");
-        sp.textContent = "·"+HUA_NAME[hm[st.name]];
-        t.appendChild(sp);
-      }
-    });
-  }
+}
+function currentParams(){ return [GAN[+ganSel.value], +zhiSel.value, +monSel.value, +hourSel.value]; }
+function onParamChange(){
+  auxState = auxRenderState(...currentParams());
+  drawAux(auxState);
+  draw(current,true);
+  renderPanel(current);
 }
 
 /* 面板 */
@@ -466,16 +480,17 @@ document.getElementById("playBtn").addEventListener("click",function(){
   this.textContent=playing?"⏸ 停止運行":"▶ 自動運行";
   if(playing)schedule(); else clearTimeout(playTimer);
 });
-[ganSel,zhiSel,monSel,hourSel].forEach(s=>s.addEventListener("change",()=>{drawAux();draw(current,true);renderPanel(current);}));
+[ganSel,zhiSel,monSel,hourSel].forEach(s=>s.addEventListener("change",onParamChange));
 ["tgZwS","tgZwD","tgTfS","tgTfD","tgAnhe","tgAnheSame","tgCross"].forEach(id=>
   document.getElementById(id).addEventListener("change",()=>draw(current,true)));
 ["tgJi","tgSha"].forEach(id=>
-  document.getElementById(id).addEventListener("change",drawAux));
-document.getElementById("tgHua").addEventListener("change",()=>{draw(current,true);drawAux();});
+  document.getElementById(id).addEventListener("change",()=>drawAux(auxState)));
+document.getElementById("tgHua").addEventListener("change",()=>{draw(current,true);drawAux(auxState);});
 document.getElementById("tgAxis").addEventListener("change",drawAxes);
 
 /* 初始 */
-drawAxes(); drawAux(); draw(0,true); renderPanel(0);
+auxState = auxRenderState(...currentParams());
+drawAxes(); drawAux(auxState); draw(0,true); renderPanel(0);
 })();
 </script>
 </body>
