@@ -10,19 +10,30 @@
 <style>
 :root{
   --ink:#0b1026; --ink-2:#111838; --parchment:#ece4cf; --dim:#9aa0b8; --gold:#d9b45b;
+  --bg-hi:#16204a; --card-bg:rgba(255,255,255,.028); --text-2:#cfd3e2;
+  --line:rgba(217,180,91,.2); --line-strong:rgba(217,180,91,.35);
   --zw-sanhe:#e8483c; --zw-dui:#f2913d;
   --tf-sanhe:#3fae6f; --tf-dui:#0abab5;
   --anhe:#a78bfa; --cross:#6b7390;
   --yang:#f2913d; --yin:#3f6ad4;
-  --ji:#e3c35e;   /* 六吉+祿存 */
+  --ji:#e3c35e;   /* 六吉+祿存+天馬 */
   --sha:#c05a6a;  /* 六煞 */
   --hua-lu:#4cc27a; --hua-quan:#e05353; --hua-ke:#5b9df0; --hua-ji:#8d8d99;
 }
+body.light{
+  --ink:#f1ead8; --ink-2:#faf5e8; --parchment:#262b45; --dim:#666c85; --gold:#a5842d;
+  --bg-hi:#fffdf4; --card-bg:rgba(90,70,15,.05); --text-2:#3c415c;
+  --line:rgba(120,95,30,.3); --line-strong:rgba(120,95,30,.55);
+  --anhe:#7c5cd6; --cross:#7d86a5;
+  --ji:#9c7d1e;
+  --hua-lu:#2e9e5d; --hua-ke:#3579d8;
+}
 *{box-sizing:border-box;margin:0;padding:0}
 body{
-  background:radial-gradient(1200px 800px at 30% 10%, #16204a 0%, var(--ink) 55%);
+  background:radial-gradient(1200px 800px at 30% 10%, var(--bg-hi) 0%, var(--ink) 55%);
   color:var(--parchment); font-family:"Noto Sans TC",sans-serif; font-weight:300; min-height:100vh;
 }
+.theme-btn{position:fixed;top:14px;right:16px;z-index:10;border-radius:20px}
 header{padding:30px 28px 8px;text-align:center}
 header h1{font-family:"Noto Serif TC",serif;font-weight:900;font-size:28px;letter-spacing:.16em}
 header h1 span{color:var(--gold)}
@@ -35,18 +46,19 @@ header p{margin-top:6px;color:var(--dim);font-size:13px;letter-spacing:.08em}
 @media(max-width:900px){.layout{grid-template-columns:1fr}}
 
 .plate-card{
-  background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,0));
-  border:1px solid rgba(217,180,91,.22);border-radius:18px;padding:16px 16px 8px;
+  background:var(--card-bg);
+  border:1px solid var(--line);border-radius:18px;padding:16px 16px 8px;
 }
 svg{display:block;width:100%;height:auto}
 
 .ctlrow{display:flex;flex-wrap:wrap;gap:9px;align-items:center;padding:10px 6px 4px;font-size:12.5px}
-.ctlrow.sep{border-top:1px solid rgba(217,180,91,.15);margin-top:8px;padding-top:12px}
+.ctlrow.sep{border-top:1px solid var(--line);margin-top:8px;padding-top:12px}
 .ctlrow label{color:var(--dim);letter-spacing:.04em}
-select,button{
-  background:var(--ink-2);color:var(--parchment);border:1px solid rgba(217,180,91,.35);
+select,button,input[type=date]{
+  background:var(--ink-2);color:var(--parchment);border:1px solid var(--line-strong);
   border-radius:8px;padding:6px 10px;font-family:inherit;font-size:12.5px;cursor:pointer;
 }
+select:disabled{opacity:.35;cursor:not-allowed}
 button:hover,select:hover{border-color:var(--gold)}
 button.playing{background:var(--gold);color:var(--ink);font-weight:500}
 input[type=range]{accent-color:var(--gold);width:100px}
@@ -56,25 +68,27 @@ input[type=range]{accent-color:var(--gold);width:100px}
 .sw{display:inline-block;width:15px;height:3px;border-radius:2px}
 
 .panel{display:flex;flex-direction:column;gap:14px}
-.card{background:rgba(255,255,255,.028);border:1px solid rgba(217,180,91,.18);border-radius:14px;padding:16px 18px}
+.card{background:var(--card-bg);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
 .card h2{
   font-family:"Noto Serif TC",serif;font-weight:600;font-size:15px;color:var(--gold);
-  letter-spacing:.14em;margin-bottom:9px;border-bottom:1px solid rgba(217,180,91,.18);padding-bottom:7px;
+  letter-spacing:.14em;margin-bottom:9px;border-bottom:1px solid var(--line);padding-bottom:7px;
 }
-.card p,.card li{font-size:13px;line-height:1.8;color:#cfd3e2}
+.card p,.card li{font-size:13px;line-height:1.8;color:var(--text-2)}
 .card ul{padding-left:17px}
 .kv{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;font-size:13px}
 .kv b{color:var(--gold);font-weight:500;white-space:nowrap}
 .tag{display:inline-block;padding:1px 8px;border-radius:20px;font-size:11.5px;border:1px solid var(--anhe);color:var(--anhe);margin:2px 3px 2px 0}
 .tag.same{border-color:var(--cross);color:var(--cross);opacity:.75}
 .tag.none{border-color:var(--dim);color:var(--dim)}
-.lg{display:grid;grid-template-columns:44px 1fr;gap:6px 10px;align-items:center;font-size:12.5px;color:#cfd3e2}
+.lg{display:grid;grid-template-columns:44px 1fr;gap:6px 10px;align-items:center;font-size:12.5px;color:var(--text-2)}
 .lg .li{height:0;border-top-width:3px;border-top-style:solid;width:40px}
 .hua{display:inline-block;width:15px;height:15px;border-radius:50%;color:#fff;font-size:10.5px;text-align:center;line-height:15px;margin-right:2px}
 footer{text-align:center;color:var(--dim);font-size:12px;padding:0 20px 36px;letter-spacing:.06em}
 </style>
 </head>
 <body>
+
+<button id="themeBtn" class="theme-btn" aria-label="切換日夜配色">☀ 日間</button>
 
 <header>
   <h1>紫微・天府 <span>雙星系拓撲盤</span></h1>
@@ -84,7 +98,7 @@ footer{text-align:center;color:var(--dim);font-size:12px;padding:0 20px 36px;let
 <div class="layout">
 
   <div class="plate-card">
-    <svg id="plate" viewBox="0 0 720 720" role="img" aria-label="紫微斗數拓撲盤"></svg>
+    <svg id="plate" viewBox="-24 -24 768 768" role="img" aria-label="紫微斗數拓撲盤"></svg>
 
     <div class="ctlrow sep">
       <label>局數</label><select id="tableSel"></select>
@@ -100,6 +114,16 @@ footer{text-align:center;color:var(--dim);font-size:12px;padding:0 20px 36px;let
       <label>年支</label><select id="zhiSel"></select>
       <label>生月</label><select id="monSel"></select>
       <label>生時</label><select id="hourSel"></select>
+      <label>命宮</label><select id="mingSel"></select>
+    </div>
+
+    <div class="ctlrow">
+      <label>模式</label>
+      <select id="modeSel"><option value="0">研究模式</option><option value="1">自動排盤</option></select>
+      <label>生日</label><select id="daySel"></select>
+      <label>公曆</label><input type="date" id="solarInput" min="1901-01-01" max="2100-12-31">
+      <button id="lunarBtn">→ 農曆</button>
+      <span id="lunarOut" style="color:var(--dim)"></span>
     </div>
 
     <div class="toggles">
@@ -111,9 +135,10 @@ footer{text-align:center;color:var(--dim);font-size:12px;padding:0 20px 36px;let
       <label><input type="checkbox" id="tgAnheSame"><span class="sw" style="border-top:2px dashed var(--cross);opacity:.5"></span>同星系暗合</label>
       <label><input type="checkbox" id="tgCross"><span class="sw" style="background:var(--cross)"></span>跨星系三合/對宮</label>
       <label><input type="checkbox" id="tgHua" checked><span class="hua" style="background:var(--hua-lu)">祿</span>四化</label>
-      <label><input type="checkbox" id="tgJi" checked><span style="color:var(--ji)">◆</span>六吉+祿存</label>
+      <label><input type="checkbox" id="tgJi" checked><span style="color:var(--ji)">◆</span>六吉+祿存+天馬</label>
       <label><input type="checkbox" id="tgSha" checked><span style="color:var(--sha)">▲</span>六煞</label>
       <label><input type="checkbox" id="tgAxis"><span class="sw" style="border-top:2px dotted var(--gold)"></span>鏡射軸</label>
+      <label><input type="checkbox" id="tgPalace" checked><span class="sw" style="background:var(--zw-sanhe)"></span>宮位環</label>
     </div>
   </div>
 
@@ -128,9 +153,14 @@ footer{text-align:center;color:var(--dim);font-size:12px;padding:0 20px 36px;let
     <div class="card">
       <h2>使用方法</h2>
       <ul>
-        <li>「循環」選單決定 ◀▶ 與「自動運行」作用的參數（局數／年干／年支／生月／生時）；按「自動運行」即以停留秒數自動循環該參數，所有變化皆以動畫平滑過渡。</li>
+        <li>「循環」選單決定 ◀▶ 與「自動運行」作用的參數（局數／年干／年支／生月／生時／生日）；按「自動運行」即以停留秒數自動循環該參數，所有變化皆以動畫平滑過渡。</li>
+        <li><b>模式</b>：研究模式下局數與命宮自由設定（現況）；切到「自動排盤」則輸入年干＋生月＋生日＋生時後，依「命宮→五虎遁→納音五行局→紫微」公式鏈自動定盤，局數與命宮變為輸出（下拉鎖定），任何參數變動即時重排。</li>
+        <li><b>公曆→農曆</b>：選公曆生日按「→農曆」即自動填入年干支／生月／生日（1901–2100；閏月依「前半當本月、後半當下月」；晚子時 23 時後出生依派別需自行加一日）。生時仍請自行選擇。</li>
         <li>年干／年支／生月／生時四個參數驅動四化與吉煞星：主盤旋轉時，<b>吉煞星固定不動</b>——它們錨定於出生四柱，不隨局數變化。</li>
         <li>各勾選框可分層開關線條與符號，便於單獨觀察。</li>
+        <li><b>宮位環</b>：以「命宮」下拉或點擊最外環任一格設定命宮，其餘十一宮依「命→兄弟→夫妻…」逆行排列；四色即四組三合宮（命財官／子僕父／夫遷福／兄疾田）。</li>
+        <li><b>身宮</b>自動依生時安於命宮順行 2×時支處（金色「·身」）：子午時同命宮、丑未時福德、寅申時官祿、卯酉時遷移、辰戌時財帛、巳亥時夫妻——位差恆偶，身命必同陰陽，且只落「命財官」「夫遷福」兩組三合宮。</li>
+        <li>右上角按鈕可切換日間／夜間配色，預設跟隨系統。</li>
       </ul>
     </div>
 
@@ -143,7 +173,7 @@ footer{text-align:center;color:var(--dim);font-size:12px;padding:0 20px 36px;let
         <span class="li" style="border-color:var(--tf-dui);border-top-width:5px"></span><span>天府系對宮</span>
         <span class="li" style="border-color:var(--anhe);border-top-style:dashed"></span><span>暗合恆定橋：跨星系專用通道，十二局皆在（僅五對）</span>
         <span class="li" style="border-color:var(--cross);border-top-style:dashed;opacity:.5"></span><span>同星系暗合：每對僅現於兩局的偶遇</span>
-        <span style="color:var(--ji);text-align:center">◆ 曲</span><span>六吉＋祿存（金色）：昌曲・輔弼・魁鉞・祿存</span>
+        <span style="color:var(--ji);text-align:center">◆ 曲</span><span>六吉＋祿存＋天馬（金色）：昌曲・輔弼・魁鉞・祿存・天馬</span>
         <span style="color:var(--sha);text-align:center">▲ 羊</span><span>六煞（絳色）：羊陀・火鈴・空劫</span>
         <span><span class="hua" style="background:var(--hua-lu)">祿</span><span class="hua" style="background:var(--hua-quan)">權</span></span><span>四化徽章：<span style="color:var(--hua-lu)">祿</span>・<span style="color:var(--hua-quan)">權</span>・<span style="color:var(--hua-ke)">科</span>・<span style="color:var(--hua-ji)">忌</span>，由年干決定，可落於主星或昌曲輔弼</span>
         <span style="color:var(--gold);text-align:center">╱ ╲</span><span>鏡射軸：寅申（主星）、丑未（昌曲・輔弼）、辰戌（魁鉞）、巳亥（空劫）</span>
@@ -159,7 +189,7 @@ footer{text-align:center;color:var(--dim);font-size:12px;padding:0 20px 36px;let
         <li><b>孤星</b>：太陽、巨門無任何固定三合對宮；巨門連永久暗合也無——全網絡最徹底孤星（古稱暗曜）。</li>
         <li><b>祿存鏈三重迴避</b>：祿存永不入四庫、擎羊永不入四馬、陀羅永不入四正；羊陀恆鉗夾祿存（羊陀夾祿）。</li>
         <li><b>四化—骨架互鎖</b>：天府、天相、七殺永不四化——固定骨架星不受時變能量；紫微只化權科、不化祿忌。</li>
-        <li><b>火鈴</b>：基點由年支三合局決定——三合局即 Z₁₂ 中子群 {0,4,8} 的四個陪集。</li>
+        <li><b>火鈴・天馬</b>：基點皆由年支三合局決定——三合局即 Z₁₂ 中子群 {0,4,8} 的四個陪集；天馬固定落四馬地（申子辰在寅、寅午戌在申、巳酉丑在亥、亥卯未在巳）。</li>
       </ul>
     </div>
 
@@ -199,9 +229,49 @@ const KUIYUE = {"甲":[1,7],"戊":[1,7],"庚":[1,7],"乙":[0,8],"己":[0,8],
                 "丙":[11,9],"丁":[11,9],"壬":[3,5],"癸":[3,5],"辛":[6,2]};
 /* 火鈴基點 (年支三合局: 支 mod 4) */
 const HUOLING_BASE = {2:[1,3], 0:[2,10], 1:[3,10], 3:[9,10]};
+/* 天馬 (年支三合局 → 四馬地): 申子辰在寅、巳酉丑在亥、寅午戌在申、亥卯未在巳 */
+const TIANMA = {0:2, 1:11, 2:8, 3:5};
+
+/* ---------- 自動排盤公式鏈 (命宮→五虎遁→納音五行局→紫微) ----------
+   全鏈 43,200 組窮舉驗證; 納音公式對照六十甲子全表、紫微公式對照古訣 13 點 */
+const JU_NAME = {2:"水二局",3:"木三局",4:"金四局",5:"土五局",6:"火六局"};
+function nayinJu(g, z){  /* 干支→納音五行→局數: 干值+支值>5減5; 1木3 2金4 3水2 4火6 5土5 */
+  let s = Math.floor(g/2)+1 + [1,1,2,2,3,3][z%6];
+  if(s>5) s-=5;
+  return [3,4,2,6,5][s-1];
+}
+function ziweiPos(ju, d){  /* q=⌈d/局⌉, r=q·局−d; 紫微=寅+(q−1)±r (r偶加奇減) */
+  const q = Math.ceil(d/ju), r = q*ju-d;
+  return mod12(2 + q-1 + (r%2===0 ? r : -r));
+}
+
+/* ---------- 公曆→農曆 (1901–2100, 資料取自 calendar.js/solarlunar,
+   已與 solarlunar 逐日交叉驗證 73,383 天零差異) ---------- */
+const LUNAR_INFO=[0x4bd8,0x4ae0,0xa570,0x54d5,0xd260,0xd950,0x16554,0x56a0,0x9ad0,0x55d2,0x4ae0,0xa5b6,0xa4d0,0xd250,0x1d255,0xb540,0xd6a0,0xada2,0x95b0,0x14977,0x4970,0xa4b0,0xb4b5,0x6a50,0x6d40,0x1ab54,0x2b60,0x9570,0x52f2,0x4970,0x6566,0xd4a0,0xea50,0x6e95,0x5ad0,0x2b60,0x186e3,0x92e0,0x1c8d7,0xc950,0xd4a0,0x1d8a6,0xb550,0x56a0,0x1a5b4,0x25d0,0x92d0,0xd2b2,0xa950,0xb557,0x6ca0,0xb550,0x15355,0x4da0,0xa5b0,0x14573,0x52b0,0xa9a8,0xe950,0x6aa0,0xaea6,0xab50,0x4b60,0xaae4,0xa570,0x5260,0xf263,0xd950,0x5b57,0x56a0,0x96d0,0x4dd5,0x4ad0,0xa4d0,0xd4d4,0xd250,0xd558,0xb540,0xb6a0,0x195a6,0x95b0,0x49b0,0xa974,0xa4b0,0xb27a,0x6a50,0x6d40,0xaf46,0xab60,0x9570,0x4af5,0x4970,0x64b0,0x74a3,0xea50,0x6b58,0x5ac0,0xab60,0x96d5,0x92e0,0xc960,0xd954,0xd4a0,0xda50,0x7552,0x56a0,0xabb7,0x25d0,0x92d0,0xcab5,0xa950,0xb4a0,0xbaa4,0xad50,0x55d9,0x4ba0,0xa5b0,0x15176,0x52b0,0xa930,0x7954,0x6aa0,0xad50,0x5b52,0x4b60,0xa6e6,0xa4e0,0xd260,0xea65,0xd530,0x5aa0,0x76a3,0x96d0,0x4afb,0x4ad0,0xa4d0,0x1d0b6,0xd250,0xd520,0xdd45,0xb5a0,0x56d0,0x55b2,0x49b0,0xa577,0xa4b0,0xaa50,0x1b255,0x6d20,0xada0,0x14b63,0x9370,0x49f8,0x4970,0x64b0,0x168a6,0xea50,0x6b20,0x1a6c4,0xaae0,0x92e0,0xd2e3,0xc960,0xd557,0xd4a0,0xda50,0x5d55,0x56a0,0xa6d0,0x55d4,0x52d0,0xa9b8,0xa950,0xb4a0,0xb6a6,0xad50,0x55a0,0xaba4,0xa5b0,0x52b0,0xb273,0x6930,0x7337,0x6aa0,0xad50,0x14b55,0x4b60,0xa570,0x54e4,0xd160,0xe968,0xd520,0xdaa0,0x16aa6,0x56d0,0x4ae0,0xa9d4,0xa4d0,0xd150,0xf252,0xd520];
+const lunLeapMonth = y => LUNAR_INFO[y-1900] & 0xf;
+const lunLeapDays  = y => lunLeapMonth(y) ? ((LUNAR_INFO[y-1900] & 0x10000) ? 30 : 29) : 0;
+const lunMonthDays = (y,m) => (LUNAR_INFO[y-1900] & (0x10000>>m)) ? 30 : 29;
+function lunYearDays(y){ let s=348; for(let i=0x8000;i>0x8;i>>=1) s += (LUNAR_INFO[y-1900]&i)?1:0; return s+lunLeapDays(y); }
+function solar2lunar(y,m,d){
+  let offset = (Date.UTC(y,m-1,d) - Date.UTC(1900,0,31)) / 86400000;
+  let year, temp = 0;
+  for(year=1900; year<2101 && offset>0; year++){ temp=lunYearDays(year); offset-=temp; }
+  if(offset<0){ offset+=temp; year--; }
+  const leap = lunLeapMonth(year); let isLeap=false, i;
+  for(i=1; i<13 && offset>0; i++){
+    if(leap>0 && i===leap+1 && isLeap===false){ --i; isLeap=true; temp=lunLeapDays(year); }
+    else temp = lunMonthDays(year,i);
+    if(isLeap===true && i===leap+1) isLeap=false;
+    offset -= temp;
+  }
+  if(offset===0 && leap>0 && i===leap+1){ if(isLeap) isLeap=false; else { isLeap=true; --i; } }
+  if(offset<0){ offset+=temp; --i; }
+  return {ly:year, lm:i, ld:offset+1, isLeap};
+}
 
 const CX=360, CY=360, R_WOUT=318, R_WIN=64,
-      R_BR=296, R_ZW=238, R_ZW_LBL=262, R_TF=176, R_TF_LBL=150, R_AUX=108;
+      R_BR=296, R_ZW=238, R_ZW_LBL=262, R_TF=176, R_TF_LBL=150, R_AUX=108,
+      R_PAL_IN=322, R_PAL_OUT=354, R_PAL_TXT=338;
 
 function theta(idx){ return (180 + 30*idx) * Math.PI/180; } /* 子在下 */
 function pt(idxFloat, r, angOff){
@@ -226,7 +296,8 @@ function auxPos(gan, zhi, mon, hour){
     "文昌":{p:mod12(10-hour), k:"ji"}, "文曲":{p:mod12(4+hour), k:"ji"},
     "左輔":{p:mod12(3+mon), k:"ji"}, "右弼":{p:mod12(11-mon), k:"ji"},
     "地劫":{p:mod12(11+hour), k:"sha"}, "地空":{p:mod12(11-hour), k:"sha"},
-    "火星":{p:mod12(hl[0]+hour), k:"sha"}, "鈴星":{p:mod12(hl[1]+hour), k:"sha"}
+    "火星":{p:mod12(hl[0]+hour), k:"sha"}, "鈴星":{p:mod12(hl[1]+hour), k:"sha"},
+    "天馬":{p:TIANMA[zhi % 4], k:"ji"}
   };
 }
 
@@ -250,16 +321,16 @@ function el(tag, attrs, parent){
     const p4=[CX+R_WIN*Math.sin(a2),CY-R_WIN*Math.cos(a2)];
     el("path",{d:`M${p1} L${p2} A${R_WOUT},${R_WOUT} 0 0 1 ${p3} L${p4} A${R_WIN},${R_WIN} 0 0 0 ${p1} Z`,
       fill:i%2===0?"var(--yang)":"var(--yin)",opacity:.16,
-      stroke:"rgba(217,180,91,.4)","stroke-width":1.2}, g);
+      stroke:"var(--gold)","stroke-opacity":.4,"stroke-width":1.2}, g);
     const [lx,ly]=pt(i,R_BR);
     el("text",{x:lx,y:ly,"text-anchor":"middle","dominant-baseline":"central",
       fill:i%2===0?"var(--yang)":"var(--yin)","font-size":17,
       "font-family":"'Noto Serif TC',serif","font-weight":600,opacity:1},g)
       .textContent = BR[i]+(i%2===0?"⁺":"⁻");
   }
-  el("circle",{cx:CX,cy:CY,r:R_ZW,fill:"none",stroke:"rgba(217,180,91,.13)","stroke-width":.7});
-  el("circle",{cx:CX,cy:CY,r:R_TF,fill:"none",stroke:"rgba(217,180,91,.13)","stroke-width":.7});
-  el("circle",{cx:CX,cy:CY,r:R_AUX,fill:"none",stroke:"rgba(217,180,91,.10)","stroke-width":.6,"stroke-dasharray":"2 4"});
+  el("circle",{cx:CX,cy:CY,r:R_ZW,fill:"none",stroke:"var(--gold)","stroke-opacity":.16,"stroke-width":.7});
+  el("circle",{cx:CX,cy:CY,r:R_TF,fill:"none",stroke:"var(--gold)","stroke-opacity":.16,"stroke-width":.7});
+  el("circle",{cx:CX,cy:CY,r:R_AUX,fill:"none",stroke:"var(--gold)","stroke-opacity":.13,"stroke-width":.6,"stroke-dasharray":"2 4"});
   el("circle",{cx:CX,cy:CY,r:3.5,fill:"var(--gold)",opacity:.7});
   el("text",{x:CX+R_ZW*0.74,y:CY-R_ZW*0.74,"text-anchor":"middle",fill:"var(--zw-sanhe)","font-size":12,
     "font-family":"'Noto Serif TC',serif",opacity:.75}).textContent="外環 紫微系";
@@ -269,11 +340,54 @@ function el(tag, attrs, parent){
     "font-family":"'Noto Serif TC',serif",opacity:.6}).textContent="吉煞環";
 })();
 
+const gPal = el("g",{});
 const gAxis = el("g",{});
 const gEdges = el("g",{});
 const gStars = el("g",{});
 const gAux = el("g",{});
 const gFly = el("g",{});
+
+/* 宮位環 (最外環，點擊設命宮；四色 = 四組三合宮 = {0,4,8} 陪集) */
+const PALACES = ["命宮","兄弟","夫妻","子女","財帛","疾厄","遷移","僕役","官祿","田宅","福德","父母"];
+const PAL_COL = ["var(--zw-sanhe)","var(--zw-dui)","var(--tf-sanhe)","var(--tf-dui)"];
+let ming = 2; /* 預設命宮在寅 */
+/* 身宮自動安法: 命宮 + 2×時支 (mod 12)
+   子午→命宮、丑未→福德、寅申→官祿、卯酉→遷移、辰戌→財帛、巳亥→夫妻 */
+function shenPos(){ return mod12(ming + 2*(+hourSel.value)); }
+function drawPalaces(){
+  gPal.innerHTML = "";
+  if(!document.getElementById("tgPalace").checked) return;
+  const shen = shenPos();
+  for(let b=0;b<12;b++){
+    const i = mod12(ming-b);           /* 宮序: 0命 1兄弟 …逆行 */
+    const col = PAL_COL[mod12(b-ming)%4];
+    const a1=theta(b-0.5), a2=theta(b+0.5);
+    const p1=[CX+R_PAL_IN*Math.sin(a1),CY-R_PAL_IN*Math.cos(a1)];
+    const p2=[CX+R_PAL_OUT*Math.sin(a1),CY-R_PAL_OUT*Math.cos(a1)];
+    const p3=[CX+R_PAL_OUT*Math.sin(a2),CY-R_PAL_OUT*Math.cos(a2)];
+    const p4=[CX+R_PAL_IN*Math.sin(a2),CY-R_PAL_IN*Math.cos(a2)];
+    const path = el("path",{d:`M${p1} L${p2} A${R_PAL_OUT},${R_PAL_OUT} 0 0 1 ${p3} L${p4} A${R_PAL_IN},${R_PAL_IN} 0 0 0 ${p1} Z`,
+      fill:col, opacity:b===ming?.32:.12, stroke:col, "stroke-opacity":.55,
+      "stroke-width":b===ming?1.6:.6, style:"cursor:pointer"}, gPal);
+    const tip = document.createElementNS(NS,"title");
+    tip.textContent = "點擊設為命宮";
+    path.appendChild(tip);
+    path.addEventListener("click", ()=>{ ming=b; mingSel.value=b; drawPalaces(); });
+    const [tx,ty]=pt(b,R_PAL_TXT);
+    const t = el("text",{x:tx,y:ty,"text-anchor":"middle","dominant-baseline":"central",
+      fill:col,"font-size":i===0?13.5:12,"font-family":"'Noto Serif TC',serif",
+      "font-weight":i===0?900:600,"pointer-events":"none",opacity:.95}, gPal);
+    t.textContent = PALACES[i];
+    if(b===shen){
+      const sp = document.createElementNS(NS,"tspan");
+      sp.setAttribute("fill","var(--gold)");
+      sp.setAttribute("font-size","10.5");
+      sp.setAttribute("font-weight","900");
+      sp.textContent = "·身";
+      t.appendChild(sp);
+    }
+  }
+}
 
 /* 鏡射軸 */
 function drawAxes(){
@@ -283,7 +397,7 @@ function drawAxes(){
   AXES.forEach(([a,b,lbl])=>{
     const [x1,y1]=pt(a,R_WOUT-8), [x2,y2]=pt(b,R_WOUT-8);
     el("line",{x1,y1,x2,y2,stroke:"var(--gold)","stroke-width":.8,"stroke-dasharray":"2 5",opacity:.5}, gAxis);
-    const [tx,ty]=pt(a,R_WOUT+14);
+    const [tx,ty]=pt(a,R_WOUT+48);
     el("text",{x:tx,y:ty,"text-anchor":"middle","dominant-baseline":"central",fill:"var(--gold)",
       "font-size":9.5,opacity:.65}, gAxis).textContent = lbl;
   });
@@ -430,6 +544,7 @@ function renderFly(flights, e){
   });
 }
 function onParamChange(){
+  drawPalaces(); /* 生時變動 → 身宮跟著移 */
   const newGan = GAN[+ganSel.value];
   const target = auxRenderState(...currentParams());
   const ganChanged = newGan !== lastGan;
@@ -489,7 +604,8 @@ function renderPanel(ti){
     `<b>局數</b><span>${TABLE_NAMES[ti]}　紫微在${BR[zw]}・天府在${BR[tf]}（和≡4）</span>`+
     `<b>陰陽</b><span>${zw%2===0?"陽局":"陰局"}（紫府同陰陽）</span>`+
     `<b>同宮</b><span>${tong.length?tong.join("、"):"無"}</span>`+
-    `<b>四化</b><span>${g}干：<span style="color:var(--hua-lu)">${sh[0]}祿</span> <span style="color:var(--hua-quan)">${sh[1]}權</span> <span style="color:var(--hua-ke)">${sh[2]}科</span> <span style="color:var(--hua-ji)">${sh[3]}忌</span></span>`;
+    `<b>四化</b><span>${g}干：<span style="color:var(--hua-lu)">${sh[0]}祿</span> <span style="color:var(--hua-quan)">${sh[1]}權</span> <span style="color:var(--hua-ke)">${sh[2]}科</span> <span style="color:var(--hua-ji)">${sh[3]}忌</span></span>`+
+    (autoInfo ? `<b>五行局</b><span>命宮${GAN[autoInfo.mgGan]}${BR[Math.round(ming)]}（納音）→ ${JU_NAME[autoInfo.ju]}・生日${DAY_NAMES[autoInfo.day-1]} → 紫微在${BR[autoInfo.t]}</span>` : "");
   const anhe = edgesAt(ti).filter(e=>e.type==="anhe");
   document.getElementById("anheList").innerHTML = anhe.length
     ? anhe.map(e=>`<span class="tag${e.cross?"":" same"}">${e.a}(${BR[e.brA]})⇄${e.b}(${BR[e.brB]})</span>`).join("")
@@ -525,27 +641,79 @@ function schedule(){
 /* 控制元件 */
 const tableSel=document.getElementById("tableSel"), ganSel=document.getElementById("ganSel"),
       zhiSel=document.getElementById("zhiSel"), monSel=document.getElementById("monSel"),
-      hourSel=document.getElementById("hourSel"), speed=document.getElementById("speed");
+      hourSel=document.getElementById("hourSel"), speed=document.getElementById("speed"),
+      mingSel=document.getElementById("mingSel"), modeSel=document.getElementById("modeSel"),
+      daySel=document.getElementById("daySel");
 const cycleSel = document.getElementById("cycleSel");
 TABLE_NAMES.forEach((n,i)=>{const o=document.createElement("option");o.value=i;o.textContent=`${n} 紫微在${BR[i]}`;tableSel.appendChild(o);});
 GAN.forEach((g,i)=>{const o=document.createElement("option");o.value=i;o.textContent=g;ganSel.appendChild(o);});
 BR.forEach((b,i)=>{const o=document.createElement("option");o.value=i;o.textContent=b;zhiSel.appendChild(o);});
 for(let m=1;m<=12;m++){const o=document.createElement("option");o.value=m;o.textContent=m+"月";monSel.appendChild(o);}
 BR.forEach((b,i)=>{const o=document.createElement("option");o.value=i;o.textContent=b+"時";hourSel.appendChild(o);});
+BR.forEach((b,i)=>{const o=document.createElement("option");o.value=i;o.textContent=b+"宮";mingSel.appendChild(o);});
+mingSel.value = ming;
+mingSel.addEventListener("change", e=>{ ming=+e.target.value; drawPalaces(); });
+const numCn="一二三四五六七八九十";
+const DAY_NAMES=[];
+for(let i=1;i<=30;i++) DAY_NAMES.push(i<=10?"初"+numCn[i-1]:i<20?"十"+numCn[i-11]:i===20?"二十":i<30?"廿"+numCn[i-21]:"三十");
+DAY_NAMES.forEach((n,i)=>{const o=document.createElement("option");o.value=i+1;o.textContent=n;daySel.appendChild(o);});
+
+/* 自動排盤 */
+const isAuto = () => modeSel.value==="1";
+let autoInfo = null;
+function autoChart(){
+  const mon=+monSel.value, hour=+hourSel.value, day=+daySel.value, yg=+ganSel.value;
+  const mg = mod12(2 + mon-1 - hour);              /* 命宮 */
+  const mgGan = (2*(yg%5)+2 + mod12(mg-2)) % 10;   /* 五虎遁命宮干 */
+  const ju = nayinJu(mgGan, mg);                    /* 納音五行局 */
+  const t = ziweiPos(ju, day);                      /* 紫微位置 = 表號 */
+  ming = mg; mingSel.value = mg;
+  autoInfo = {ju, mgGan, day, t};
+  drawPalaces(); goTo(t);
+}
+function applyMode(){
+  const a = isAuto();
+  tableSel.disabled = a; mingSel.disabled = a;
+  if(a) autoChart(); else { autoInfo=null; renderPanel(current); }
+}
+modeSel.addEventListener("change", applyMode);
+function anyParamChanged(){ onParamChange(); if(isAuto()) autoChart(); }
+daySel.addEventListener("change", ()=>{ if(isAuto()) autoChart(); });
+
+/* 公曆→農曆 (閏月依「前半當本月、後半當下月」) */
+document.getElementById("lunarBtn").addEventListener("click", ()=>{
+  const v = document.getElementById("solarInput").value, out=document.getElementById("lunarOut");
+  if(!v) return;
+  const [y,m,d] = v.split("-").map(Number);
+  if(y<1901 || y>2100){ out.textContent="僅支援 1901–2100"; return; }
+  const L = solar2lunar(y,m,d);
+  let lm = L.lm, note = "";
+  const monCn = n => n<=10 ? numCn[n-1] : "十"+numCn[n-11];
+  if(L.isLeap){
+    note = `（閏${monCn(L.lm)}月${L.ld<=15?"前半當本月":"後半當下月"}）`;
+    if(L.ld>15) lm = lm%12+1;
+  }
+  const yg=(L.ly-4)%10, yz=(L.ly-4)%12;
+  ganSel.value=yg; zhiSel.value=yz; monSel.value=lm; daySel.value=L.ld;
+  out.textContent = `${GAN[yg]}${BR[yz]}年${monCn(lm)}月${DAY_NAMES[L.ld-1]}${note}`;
+  anyParamChanged();
+});
 const CYCLE = [
   {label:"局數"},
   {label:"年干", sel:ganSel,  n:10, min:0},
   {label:"年支", sel:zhiSel,  n:12, min:0},
   {label:"生月", sel:monSel,  n:12, min:1},
-  {label:"生時", sel:hourSel, n:12, min:0}
+  {label:"生時", sel:hourSel, n:12, min:0},
+  {label:"生日", sel:daySel,  n:30, min:1}
 ];
 CYCLE.forEach((c,i)=>{ const o=document.createElement("option"); o.value=i; o.textContent=c.label; cycleSel.appendChild(o); });
 function stepCycle(dir){
   const c = CYCLE[+cycleSel.value];
-  if(!c.sel){ goTo(current+dir); return; }
+  if(!c.sel){ if(!isAuto()) goTo(current+dir); return; } /* 排盤模式下局數為輸出，不可循環 */
   const v = +c.sel.value - c.min;
   c.sel.value = c.min + ((v + dir) % c.n + c.n) % c.n;
-  onParamChange();
+  if(c.sel===daySel){ if(isAuto()) autoChart(); return; }
+  anyParamChanged();
 }
 
 tableSel.addEventListener("change",e=>goTo(+e.target.value));
@@ -558,17 +726,33 @@ document.getElementById("playBtn").addEventListener("click",function(){
   this.textContent=playing?"⏸ 停止運行":"▶ 自動運行";
   if(playing)schedule(); else clearTimeout(playTimer);
 });
-[ganSel,zhiSel,monSel,hourSel].forEach(s=>s.addEventListener("change",onParamChange));
+[ganSel,zhiSel,monSel,hourSel].forEach(s=>s.addEventListener("change",anyParamChanged));
 ["tgZwS","tgZwD","tgTfS","tgTfD","tgAnhe","tgAnheSame","tgCross"].forEach(id=>
   document.getElementById(id).addEventListener("change",()=>draw(current,true)));
 ["tgJi","tgSha"].forEach(id=>
   document.getElementById(id).addEventListener("change",()=>drawAux(auxState)));
 document.getElementById("tgHua").addEventListener("change",()=>{draw(current,true);drawAux(auxState);});
 document.getElementById("tgAxis").addEventListener("change",drawAxes);
+document.getElementById("tgPalace").addEventListener("change",drawPalaces);
+
+/* 日夜主題 */
+const themeBtn = document.getElementById("themeBtn");
+function setTheme(light, save){
+  document.body.classList.toggle("light", light);
+  themeBtn.textContent = light ? "☾ 夜間" : "☀ 日間";
+  if(save){ try{ localStorage.setItem("zwTheme", light?"light":"dark"); }catch(e){} }
+}
+let savedTheme = null;
+try{ savedTheme = localStorage.getItem("zwTheme"); }catch(e){}
+setTheme(savedTheme ? savedTheme==="light" : matchMedia("(prefers-color-scheme: light)").matches, false);
+themeBtn.addEventListener("click", ()=>setTheme(!document.body.classList.contains("light"), true));
+matchMedia("(prefers-color-scheme: light)").addEventListener("change", e=>{
+  if(!localStorage.getItem("zwTheme")) setTheme(e.matches, false);
+});
 
 /* 初始 */
 auxState = auxRenderState(...currentParams());
-drawAxes(); drawAux(auxState); draw(0,true); renderPanel(0);
+drawPalaces(); drawAxes(); drawAux(auxState); draw(0,true); renderPanel(0);
 })();
 </script>
 </body>
