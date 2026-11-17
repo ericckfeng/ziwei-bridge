@@ -30,7 +30,7 @@ The script is organized in layers, top to bottom:
 
 Relationship semantics used throughout: 三合 = position difference 4 or 8; 對宮 = difference 6; 暗合 = position sum ≡ 1 (mod 12).
 
-The 「數學觀察」 card in the HTML documents the mathematical theorems the visualization demonstrates (鏡射定理, 互斥定理, 2:4:2律, etc.) — keep it consistent with the code if the math logic changes.
+The 「數學觀察」 card in the HTML documents the mathematical theorems the visualization demonstrates (鏡射定理, 互斥定理, 2:4:2:4律, etc.) — keep it consistent with the code if the math logic changes.
 
 ## Git Conventions
 
