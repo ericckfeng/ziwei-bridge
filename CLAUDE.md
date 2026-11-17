@@ -35,3 +35,7 @@ The 「數學觀察」 card in the HTML documents the mathematical theorems the 
 ## Git Conventions
 
 Commit messages follow the parent vault convention (English, conventional commits style), though existing history contains Chinese messages.
+
+## Research notes
+
+`研究紀錄.md` records research scope decisions, negative results, and the main line of inquiry (why the two star series are arranged as they are, and how that ties to the palace naming). Append new findings there; only brute-force-verified statements go into the 「數學觀察」 card.
