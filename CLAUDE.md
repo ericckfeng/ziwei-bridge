@@ -25,7 +25,7 @@ The script is organized in layers, top to bottom:
 
 1. **Domain data tables** — `ZW_OFF` / `TF_OFF` (fixed offsets of the 紫微 and 天府 star series), `SIHUA` (四化 by year stem, includes 昌曲輔弼), `LUCUN`, `KUIYUE`, `HUOLING_BASE` (吉煞 star lookup tables keyed by birth pillars).
 2. **Position math** — everything is arithmetic mod 12 (`mod12`, `theta`, `pt`). Core invariant in `starPos(t)`: the 紫微 series rotates as `t + offset` while the 天府 series counter-rotates as `4 - t + offset` (mirror across the 寅申 axis, i.e. 紫微+天府 ≡ 4). `auxPos()` computes 吉煞 stars from year stem/branch, month, and hour — these are anchored to birth pillars and deliberately do NOT rotate with the chart number (局數).
-3. **SVG rendering layers** — a static base plate, then four `<g>` groups redrawn independently: `gAxis` (mirror axes), `gEdges` (三合/對宮/暗合 relationship lines via `edgesAt`/`edgeStyle`/`edgeVisible`), `gStars` (14 main stars + 四化 badges), `gAux` (吉煞 symbols). Checkbox toggles map 1:1 to edge/layer visibility.
+3. **SVG rendering layers** — a static base plate, then several `<g>` groups redrawn independently: `gAxis` (mirror axes), `gGeo` (branch-level overlays that do not depend on the chart number: the 六合梯 path and the two 三合稜柱, drawn by `drawGeo`), `gEdges` (三合/對宮/暗合 relationship lines via `edgesAt`/`edgeStyle`/`edgeVisible`), `gStars` (14 main stars + 四化 badges), `gAux` (吉煞 symbols). Checkbox toggles map 1:1 to edge/layer visibility.
 4. **Animation/controls** — `goTo()` tweens rotation between the 12 charts with `requestAnimationFrame` (respects `prefers-reduced-motion`); `schedule()` drives auto-play.
 
 Relationship semantics used throughout: 三合 = position difference 4 or 8; 對宮 = difference 6; 暗合 = position sum ≡ 1 (mod 12).
