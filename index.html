@@ -19,6 +19,7 @@
   --ji:#e3c35e;   /* 六吉+祿存+天馬 */
   --sha:#c05a6a;  /* 六煞 */
   --hua-lu:#4cc27a; --hua-quan:#e05353; --hua-ke:#5b9df0; --hua-ji:#8d8d99;
+  --prism-a:#58b4e8; --prism-b:#f07a9a;  /* 三合稜柱: 水金 / 火木 */
 }
 body.light{
   --ink:#f1ead8; --ink-2:#faf5e8; --parchment:#262b45; --dim:#666c85; --gold:#a5842d;
@@ -27,6 +28,7 @@ body.light{
   --anhe:#7c5cd6; --cross:#7d86a5;
   --ji:#9c7d1e;
   --hua-lu:#2e9e5d; --hua-ke:#3579d8;
+  --prism-a:#2b7fb8; --prism-b:#c8446c;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{
@@ -138,6 +140,8 @@ footer{text-align:center;color:var(--dim);font-size:12px;padding:0 20px 36px;let
       <label><input type="checkbox" id="tgJi" checked><span style="color:var(--ji)">◆</span>六吉+祿存+天馬</label>
       <label><input type="checkbox" id="tgSha" checked><span style="color:var(--sha)">▲</span>六煞</label>
       <label><input type="checkbox" id="tgAxis"><span class="sw" style="border-top:2px dotted var(--gold)"></span>鏡射軸</label>
+      <label><input type="checkbox" id="tgLadder"><span class="sw" style="background:var(--parchment)"></span>六合梯</label>
+      <label><input type="checkbox" id="tgPrism"><span class="sw" style="background:linear-gradient(90deg,var(--prism-a) 50%,var(--prism-b) 50%)"></span>三合稜柱</label>
       <label><input type="checkbox" id="tgPalace" checked><span class="sw" style="background:var(--zw-sanhe)"></span>宮位環</label>
     </div>
   </div>
@@ -176,6 +180,9 @@ footer{text-align:center;color:var(--dim);font-size:12px;padding:0 20px 36px;let
         <span style="color:var(--ji);text-align:center">◆ 曲</span><span>六吉＋祿存＋天馬（金色）：昌曲・輔弼・魁鉞・祿存・天馬</span>
         <span style="color:var(--sha);text-align:center">▲ 羊</span><span>六煞（絳色）：羊陀・火鈴・空劫</span>
         <span><span class="hua" style="background:var(--hua-lu)">祿</span><span class="hua" style="background:var(--hua-quan)">權</span></span><span>四化徽章：<span style="color:var(--hua-lu)">祿</span>・<span style="color:var(--hua-quan)">權</span>・<span style="color:var(--hua-ke)">科</span>・<span style="color:var(--hua-ji)">忌</span>，由年干決定，可落於主星或昌曲輔弼</span>
+        <span class="li" style="border-color:var(--parchment)"></span><span>六合梯：粗線＝六合橫檔，細線＝鄰宮接續，數字＝路徑次序（子1→未12），點線＝未回子的六害</span>
+        <span class="li" style="border-color:var(--prism-a)"></span><span>三合稜柱・水金：申子辰△與巳酉丑△，以子丑・辰酉・巳申三條六合相連</span>
+        <span class="li" style="border-color:var(--prism-b)"></span><span>三合稜柱・火木：寅午戌△與亥卯未△，以寅亥・卯戌・午未三條六合相連</span>
         <span style="color:var(--gold);text-align:center">╱ ╲</span><span>鏡射軸：寅申（主星）、丑未（昌曲・輔弼）、辰戌（魁鉞）、巳亥（空劫）</span>
       </div>
     </div>
@@ -185,11 +192,21 @@ footer{text-align:center;color:var(--dim);font-size:12px;padding:0 20px 36px;let
       <ul>
         <li><b>鏡射定理</b>：紫微＋天府≡4（寅申軸）；昌＋曲≡2、輔＋弼≡2（丑未軸）；魁＋鉞≡8（辰戌軸）；空＋劫≡10（巳亥軸）。全部鏡射對永遠同陰陽；子午、卯酉二軸從不使用——四正之位不作鏡軸。</li>
         <li><b>互斥定理</b>：跨星系配對中，永久暗合（和≡9）與三方四正（差為偶）絕對互斥。五永久橋：太陽—天府、武曲—太陰、天同—貪狼、廉貞—天梁、天機—破軍。</li>
-        <li><b>2:4:2律</b>：可三方四正的24組跨星系配對，十二局中一律同宮2局、三合4局、對宮2局。</li>
+        <li><b>2:4:2:4律</b>：可三方四正的24組跨星系配對（偶和），十二局中一律同宮2局、三合4局、對宮2局，其餘4局相隔一宮（差2或10），不成三方四正。</li>
         <li><b>孤星</b>：太陽、巨門無任何固定三合對宮；巨門連永久暗合也無——全網絡最徹底孤星（古稱暗曜）。</li>
         <li><b>祿存鏈三重迴避</b>：祿存永不入四庫、擎羊永不入四馬、陀羅永不入四正；羊陀恆鉗夾祿存（羊陀夾祿）。</li>
         <li><b>四化—骨架互鎖</b>：天府、天相、七殺永不四化——固定骨架星不受時變能量；紫微只化權科、不化祿忌。</li>
         <li><b>火鈴・天馬</b>：基點皆由年支三合局決定——三合局即 Z₁₂ 中子群 {0,4,8} 的四個陪集；天馬固定落四馬地（申子辰在寅、寅午戌在申、巳酉丑在亥、亥卯未在巳）。</li>
+        <li><b>六合梯</b>：依「子丑→寅亥→戌卯→辰酉→申巳→午未」串連十二支，陰陽嚴格交替，每步非六合即鄰宮；兩軌為丑～午（順）與子～未（逆），六合是六根橫檔，終點未回起點子恰為六害（和≡7）。</li>
+        <li><b>九單元環</b>：每顆紫微系星與其永久暗合星綁成一單元，依紫微系位差 a 排成環——0紫微、3七殺、4廉貞＋天梁、5天相、6巨門、7天同＋貪狼、8武曲＋太陰、9太陽＋天府、11天機＋破軍；1、2、10為空位。橋對必一陰一陽、分居兩軌。</li>
+        <li><b>配對定理</b>：紫微在 t 宮時，單元 a 與單元 (1−2t−a) 同落一個六合階。1−2t 只取六個奇數，故十二局只有六種分組；表 t 與表 t+6 為整盤旋轉 180°。整階全空僅見於紫微在丑未（寅亥或巳申階）與巳亥（子丑或午未階）。</li>
+        <li><b>恆差與恆和</b>：同系星對位差恆定，異系星對位置和恆定，故 48 組異系對各有固定鏡軸。偶和 24 組即傳統雙星，只在軸端同宮——丑未：紫破、廉殺、同巨、武貪、日月；寅申：紫府、同梁、武相、陽巨、機陰；卯酉：紫貪、廉破、武殺、陽梁、機巨；子午：廉相、同陰、武府；辰戌：紫相、廉府、機梁；巳亥：紫殺、廉貪、武破。日月與昌曲、輔弼共用丑未軸。</li>
+        <li><b>4:4:4律與永久六害</b>：奇和的 24 組異系對永不同宮、三合、對宮，十二局中一律相鄰4局、差三宮4局、差五宮4局。其中和≡1為五永久橋，和≡7為三組永久六害：紫微—巨門、太陽—七殺、天機—天相。</li>
+        <li><b>三合稜柱</b>：六合串入三合，十二支裂成兩個三角稜柱——申子辰⇄巳酉丑（水金）與寅午戌⇄亥卯未（火木），再加對宮才連成一體；三合、對宮、六合生成 12 階二面體群，在十二支上恰好一一對應。四個三合局之間，六合配水金・火木（相生），對宮配水火・金木（相剋），六害配水木・金火（一生一剋）——正是四局的三種完美配對。</li>
+        <li><b>三方二分律</b>：單元依 a mod 4 分成四個稜柱——紫廉武⇄陰梁、機同⇄殺破狼、太陽⇄府相、巨門獨佔一柱（孤星之源）。十二局的三合局組成只有兩種：紫微在陽宮為「紫府廉武相／殺破狼／機巨同／陽陰梁」，在陰宮為「紫廉武殺破狼／府相／機月同梁／巨日」。紫微系六星位差 mod 6 各異，各佔一條對宮軸，系內無對宮。</li>
+        <li><b>合鏡成刑</b>：六合（x→1−x）接紫府鏡射（x→4−x）等於轉三宮，兩者生成 8 階二面體群；四馬地寅申巳亥自成一軌道，其餘八支為另一軌道。</li>
+        <li><b>時系星恆合</b>：順行與逆行的時系星位置和恆定，依年支三合局出現永久暗合——申子辰年地空—火星、巳酉丑年文昌—火星、寅午戌年文昌—鈴星；亥卯未年無，文昌—火星恆六害。寅午戌年以外鈴昌只在辰戌同宮；地空恆在文昌下一宮。</li>
+        <li><b>四化與橋</b>：十干四化中唯一落在永久橋上的是庚干武曲化權—太陰化科；祿與忌從不暗合。</li>
       </ul>
     </div>
 
@@ -342,6 +359,7 @@ function el(tag, attrs, parent){
 
 const gPal = el("g",{});
 const gAxis = el("g",{});
+const gGeo = el("g",{});
 const gEdges = el("g",{});
 const gStars = el("g",{});
 const gAux = el("g",{});
@@ -401,6 +419,48 @@ function drawAxes(){
     el("text",{x:tx,y:ty,"text-anchor":"middle","dominant-baseline":"central",fill:"var(--gold)",
       "font-size":9.5,opacity:.65}, gAxis).textContent = lbl;
   });
+}
+
+/* 地支幾何檢視 (不隨局數變動): 六合梯 + 三合稜柱
+   六合梯: 子丑→寅亥→戌卯→辰酉→申巳→午未, 陰陽交替, 每步非六合(和≡1)即鄰宮
+   三合稜柱: 六合把三合局兩兩相連 — 水(申子辰)⇄金(巳酉丑)、火(寅午戌)⇄木(亥卯未) */
+const LADDER = [0,1,2,11,10,3,4,9,8,5,6,7];
+const R_GEO = 278;
+function drawGeo(){
+  gGeo.innerHTML = "";
+  const on = id => document.getElementById(id).checked;
+  const seg = (a,b,attrs) => {
+    const [x1,y1]=pt(a,R_GEO), [x2,y2]=pt(b,R_GEO);
+    el("line",Object.assign({x1,y1,x2,y2,"stroke-linecap":"round"},attrs), gGeo);
+  };
+  const dot = (i,col) => { const [x,y]=pt(i,R_GEO); el("circle",{cx:x,cy:y,r:3.2,fill:col}, gGeo); };
+  if(on("tgPrism")){
+    for(let j=0;j<4;j++){                      /* 局 j = 支 mod 4: 0水 1金 2火 3木 */
+      const col = j<2 ? "var(--prism-a)" : "var(--prism-b)";
+      for(let k=0;k<3;k++){
+        seg(j+4*k, j+4*((k+1)%3), {stroke:col,"stroke-width":1.5,opacity:.85});
+        dot(j+4*k, col);
+      }
+    }
+    for(let k=0;k<6;k++){                      /* 六合橫檔: 陽支 x ↔ 陰支 1−x */
+      const x = 2*k;
+      seg(x, mod12(1-x), {stroke:x%4===0?"var(--prism-a)":"var(--prism-b)","stroke-width":2.6,opacity:.8});
+    }
+  }
+  if(on("tgLadder")){
+    const col = "var(--parchment)";
+    for(let n=0;n<11;n++){
+      const rung = n%2===0;
+      seg(LADDER[n], LADDER[n+1], {stroke:col,"stroke-width":rung?2.4:1.1,opacity:rung?.85:.6});
+    }
+    seg(LADDER[11], LADDER[0], {stroke:col,"stroke-width":1,"stroke-dasharray":"1 5",opacity:.6});
+    LADDER.forEach((b,n)=>{
+      dot(b, col);
+      const [tx,ty]=pt(b,R_BR+3,7.5);
+      el("text",{x:tx,y:ty,"text-anchor":"middle","dominant-baseline":"central",fill:col,
+        "font-size":10,"font-weight":600,opacity:.8}, gGeo).textContent = n+1;
+    });
+  }
 }
 
 /* 關係 */
@@ -733,6 +793,7 @@ document.getElementById("playBtn").addEventListener("click",function(){
   document.getElementById(id).addEventListener("change",()=>drawAux(auxState)));
 document.getElementById("tgHua").addEventListener("change",()=>{draw(current,true);drawAux(auxState);});
 document.getElementById("tgAxis").addEventListener("change",drawAxes);
+["tgLadder","tgPrism"].forEach(id=>document.getElementById(id).addEventListener("change",drawGeo));
 document.getElementById("tgPalace").addEventListener("change",drawPalaces);
 
 /* 日夜主題 */
