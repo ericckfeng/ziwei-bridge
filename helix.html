@@ -32,13 +32,15 @@ header h1 span{color:var(--gold)}
 header p{margin-top:6px;color:var(--dim);font-size:13px;letter-spacing:.06em}
 header a{color:var(--gold)}
 .layout{
-  display:grid;grid-template-columns:minmax(0,780px) minmax(0,400px);
-  gap:24px;max-width:1240px;margin:12px auto 56px;padding:0 16px;align-items:start;
+  display:grid;grid-template-columns:minmax(0,1fr) minmax(0,360px);
+  gap:20px;max-width:1560px;margin:12px auto 56px;padding:0 16px;align-items:start;
 }
 @media(max-width:900px){.layout{grid-template-columns:minmax(0,1fr)}}
 .stage{background:var(--card-bg);border:1px solid var(--line);border-radius:18px;padding:12px 12px 8px}
-canvas{display:block;width:100%;aspect-ratio:4/3;touch-action:none;cursor:grab}
+canvas{display:block;width:100%;aspect-ratio:16/11;touch-action:none;cursor:grab}
 canvas.tall{aspect-ratio:1/1.05}
+.stage:fullscreen{display:flex;flex-direction:column;background:var(--ink);border-radius:0;padding:10px 14px;overflow:auto}
+.stage:fullscreen canvas{flex:1 1 auto;aspect-ratio:auto;min-height:0}
 canvas:active{cursor:grabbing}
 .ctlrow{display:flex;flex-wrap:wrap;gap:9px;align-items:center;padding:10px 4px 4px;font-size:12.5px}
 .ctlrow.sep{border-top:1px solid var(--line);margin-top:6px;padding-top:12px}
@@ -119,6 +121,12 @@ footer a{color:var(--gold)}
         <option value="heads">只看兩主星（紫微、天府）</option>
         <option value="bridged">只看暗合五對</option>
       </select>
+      <label>星軌</label>
+      <select id="trailSel">
+        <option value="all">全部顯示</option>
+        <option value="sel">只顯示選定星</option>
+        <option value="none">隱藏（只留本局星點與連線）</option>
+      </select>
     </div>
     <div class="ctlrow">
       <label>視角</label>
@@ -131,6 +139,7 @@ footer a{color:var(--gold)}
       <button id="spinBtn">⟳ 自轉</button>
       <button id="zoomOut" aria-label="縮小">－</button>
       <button id="zoomIn" aria-label="放大">＋</button>
+      <button id="fsBtn">⛶ 全螢幕</button>
     </div>
     <div class="ctlrow">
       <label>局數</label>
@@ -140,6 +149,9 @@ footer a{color:var(--gold)}
       <span id="lvlLabel" style="color:var(--gold)">紫微在子</span>
       <button id="playBtn">▶ 永動</button>
       <button id="stopBtn">■ 停止</button>
+      <label for="speed">速度</label>
+      <input type="range" id="speed" min="1" max="9" step="1" value="5">
+      <span id="speedLabel" style="color:var(--dim)">每局 2 秒</span>
     </div>
     <div class="toggles">
       <label><input type="checkbox" id="tgZw" checked><span class="sw" style="background:var(--zw)"></span>紫微系</label>
@@ -169,6 +181,7 @@ footer a{color:var(--gold)}
         <li><b>環面</b>（預設）：繞著管子的一圈是十二地支，沿著大圓的一圈是局數（紫微所在宮）。十二局循環，亥之後回到子，所以把圓柱的頭尾接起來，就是這個結構真正的形狀。管子外緣的小字是局數，金色細圈是目前標示的那一局。</li>
         <li><b>圓柱</b>：把環面從「紫微在子」剪開攤平。圓周是十二地支（子在正前方，與拓撲盤同向），高度由下而上從子到亥，最上一層回到子。</li>
         <li><b>每條曲線</b>是一顆主星走過十二局的軌跡：紫微系隨局數順時針前進，天府系逆時針後退，各轉一整圈。</li>
+        <li><b>看不清時</b>：按「全螢幕」把立體圖放到最大；「星軌」可改為只顯示選定星，或全部隱藏——隱藏時仍保留目前這一局的星點、標示圈、暗合梯級與選定星的關係連線。「速度」拉桿調整永動時每一局停留的秒數。</li>
         <li><b>操作</b>：拖曳旋轉；滾輪或雙指縮放；「視角」按鈕可直接切到正面、斜上、俯視、側面、仰視。「跟隨本局」會讓鏡頭追著目前那一局，放大並正對它的截面——這個截面就是一張十二宮圓盤，永動時可以看著十四顆星在盤上轉動。拖曳畫面即離開跟隨。</li>
         <li><b>永動與停止</b>：按「永動」，標示圈沿環面連續流動，十四顆星沿各自的軌道滑行，一圈之後回到原點。「暫停」停在當下的位置（可能在兩局之間）；「停止」會停在最接近的完整一局；◀ ▶ 逐局前後走。</li>
         <li><b>看相對位置</b>：點立體圖上的任一顆星，或點右側現況盤裡的星名，即可選定這顆星，看它在這一局的同宮、三合、對宮、暗合與夾。</li>
@@ -295,7 +308,7 @@ function draw(){
   }
   const mode = $("modeSel").value;
   const C = {zw:css("--zw"), tf:css("--tf"), anhe:css("--anhe"), mirror:css("--mirror"),
-             gold:css("--gold"), dim:css("--dim"), text:css("--parchment"), line:css("--line-strong")};
+             gold:css("--gold"), dim:css("--dim"), text:css("--parchment"), line:css("--line-strong"), ink:css("--ink")};
   ctx.setTransform(DPR,0,0,DPR,0,0);
   ctx.clearRect(0,0,W,H);
   const prims = [];
@@ -311,11 +324,12 @@ function draw(){
       if(hollow){ ctx.strokeStyle = col; ctx.lineWidth = 1.5; ctx.stroke(); } else { ctx.fillStyle = col; ctx.fill(); } }});
     return P;
   };
-  const text = (p, str, col, size, weight) => {
+  const text = (p, str, col, size, weight, halo) => {
     const P = project(p);
-    prims.push({z:P.z+0.02, f(){ ctx.globalAlpha = Math.min(1, alphaOf(P.z)+0.15); ctx.fillStyle = col;
+    prims.push({z:P.z+0.02, f(){ ctx.globalAlpha = Math.min(1, alphaOf(P.z)+0.15); ctx.setLineDash([]);
       ctx.font = `${weight||500} ${size}px "Noto Sans TC",sans-serif`; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-      ctx.fillText(str, P.X, P.Y); }});
+      if(halo){ ctx.lineJoin = "round"; ctx.lineWidth = 3.5; ctx.strokeStyle = C.ink; ctx.strokeText(str, P.X, P.Y); }
+      ctx.fillStyle = col; ctx.fillText(str, P.X, P.Y); }});
   };
 
   /* 骨架：圓柱的上下底圈與中軸；環面的切口圈、內外赤道與局數 */
@@ -331,7 +345,7 @@ function draw(){
     for(let s0=0;s0<12;s0++) text(geo(s0, -3, 1.45), "紫微在" + BR[s0], C.dim, 10, 400);
   }
   /* 地支標在目前那一局的截面上，跟著標示圈走 */
-  for(let i=0;i<12;i++) text(geo(level, i, shape === "cyl" ? 1.34 : 1.36), BR[i], i%2 ? C.dim : C.gold, 12, 600);
+  for(let i=0;i<12;i++) text(geo(level, i, shape === "cyl" ? 1.62 : 1.66), BR[i], i%2 ? C.dim : C.gold, 13, 600, true);
 
   /* 星軌 */
   const STEP = 0.05;
@@ -342,25 +356,26 @@ function draw(){
   const vis = n => series.some(x => x[1] === n);
   const bg = following ? 0.4 : 1;   /* 跟隨時把背景調淡，突顯本局截面 */
   const fade = n => (selected && n !== selected ? 0.45 : 1) * (n === selected ? 1 : bg);
-  series.forEach(([sr, n, col]) => {
+  const trail = $("trailSel").value, showTrail = n => trail === "all" || (trail === "sel" && n === selected);
+  series.filter(([, n]) => showTrail(n)).forEach(([sr, n, col]) => {
     let prev = world(sr, n, 0, mode);
     for(let s = STEP; s <= 12 + 1e-9; s += STEP){
       const cur = world(sr, n, s, mode);
-      seg(prev, cur, col, n === selected ? 2.4 : 1.25, [], fade(n));
+      seg(prev, cur, col, n === selected ? 2.2 : 1.1, [], n === selected ? 1 : (selected || following ? 0.4 : 0.6));
       prev = cur;
     }
   });
 
   /* 梯級（每一局） */
   const both = on("tgZw") && on("tgTf");
-  for(let s=0;s<=12;s++){
+  for(let s=0;s<=12 && trail === "all";s++){
     if(both && on("tgBridge")) BRIDGES.filter(([z,f]) => vis(z) && vis(f)).forEach(([z,f]) =>
       seg(world("zw",z,s,mode), world("tf",f,s,mode), C.anhe, 0.8, [4,4], 0.6*(selected ? 0.6 : 1)*bg));
     if(both && on("tgMirror")) MIRRORS.filter(([z,f]) => vis(z) && vis(f)).forEach(([z,f]) =>
       seg(world("zw",z,s,mode), world("tf",f,s,mode), C.mirror, 0.8, [2,4], 0.6*bg));
   }
   /* 交會點（只在麻花模式有意義） */
-  if(mode === "braid" && both && !following){
+  if(mode === "braid" && both && !following && trail === "all"){
     for(let k=0;k<24;k++){
       const s = k/2;
       ZW.filter(vis).forEach(z => TF.filter(vis).forEach(f => {
@@ -386,16 +401,18 @@ function draw(){
     link(R.dui, C.gold, 2.2, []);
     link(R.anhe, C.anhe, 1.6, [5,3]);
     link(R.jia, C.dim, 1, [2,3]);
-    R.same.filter(vis).forEach(o => dot(world(seriesOf(o), o, level, mode), C.gold, 7.5, true, 0.03));
-    dot(src, C.gold, 9, true, 0.03);
+    R.same.filter(vis).forEach(o => dot(world(seriesOf(o), o, level, mode), C.gold, 10.5, true, 0.05));
+    dot(src, C.gold, 12, true, 0.05);
   }
 
   lastDots = [];
+  const stack = {};   /* 同宮的星名往外錯開，避免互相蓋住 */
   series.forEach(([sr, n, col]) => {
     const [ang, rf] = angRf(sr, n, level, mode);
-    const P = dot(geo(level, ang, rf), col, n === selected ? 4.8 : 3.8);
+    const P = dot(geo(level, ang, rf), col, n === selected ? 8.5 : 6.5, false, 0.04);
     lastDots.push({n, X:P.X, Y:P.Y});
-    if(on("tgNames")) text(geo(level, ang, rf === 1 ? 1.2 : 0.72), n, col, n === selected ? 13 : 11.5, n === selected ? 700 : 600);
+    const key = rf + "|" + mod12(Math.round(ang)), k = stack[key] = (stack[key] || 0) + 1;
+    if(on("tgNames")) text(geo(level, ang, (rf === 1 ? 1.22 : 0.72) + (k - 1) * 0.19), n, col, n === selected ? 16 : 14, 700, true);
   });
 
   prims.sort((a,b) => a.z - b.z).forEach(p => p.f());
@@ -495,7 +512,7 @@ function endPointer(e){
   if(pointers.size < 2) pinch0 = null;
   if(downAt && downAt.moved < 4 && pointers.size === 0){
     const r = cv.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
-    let best = null, bd = 18;
+    let best = null, bd = 22;
     lastDots.forEach(d => { const dd = Math.hypot(d.X - x, d.Y - y); if(dd < bd){ bd = dd; best = d.n; } });
     if(best) select(best); else if(selected) select(selected);   /* 點空白處取消選取 */
   }
@@ -523,6 +540,24 @@ $("followBtn").addEventListener("click", () => { setFollow(!following); pitch = 
 $("spinBtn").addEventListener("click", () => { setSpin(!spinning); if(spinning) setFollow(false); });
 $("zoomIn").addEventListener("click", () => { zoom = Math.min(3.5, zoom * 1.2); draw(); });
 $("zoomOut").addEventListener("click", () => { zoom = Math.max(0.5, zoom / 1.2); draw(); });
+const stage = document.querySelector(".stage");
+let fsPending = false;
+$("fsBtn").addEventListener("click", () => {
+  if(fsPending) return;                       /* 切換進行中，忽略連點 */
+  fsPending = true; $("fsBtn").disabled = true;
+  const done = () => { fsPending = false; $("fsBtn").disabled = false; };
+  if(document.fullscreenElement) document.exitFullscreen().catch(() => {}).finally(done);
+  else stage.requestFullscreen().catch(() => {
+    $("fsBtn").textContent = "⛶ 無法全螢幕";
+    $("fsBtn").title = "瀏覽器拒絕了全螢幕（例如頁面被嵌入或權限不足）";
+    setTimeout(() => { if(!document.fullscreenElement) $("fsBtn").textContent = "⛶ 全螢幕"; }, 2500);
+  }).finally(done);
+});
+document.addEventListener("fullscreenchange", () => {
+  $("fsBtn").textContent = document.fullscreenElement ? "⛶ 離開全螢幕" : "⛶ 全螢幕";
+  requestAnimationFrame(resize);
+});
+if(!stage.requestFullscreen) $("fsBtn").hidden = true;
 $("shapeSel").addEventListener("change", e => {
   shape = e.target.value; pitch = defaultPitch(); zoom = 1;
   if(shape !== "torus") setFollow(false);
@@ -534,8 +569,15 @@ $("lvl").addEventListener("input", e => goLevel(+e.target.value));
 $("prevBtn").addEventListener("click", () => goLevel(Math.ceil(level - 1e-6) - 1));
 $("nextBtn").addEventListener("click", () => goLevel(Math.floor(level + 1e-6) + 1));
 $("playBtn").addEventListener("click", () => setFlow(!flowing));
+/* 速度：每一局停留的秒數 */
+const SPEEDS = [8, 6, 4, 3, 2, 1.5, 1, 0.7, 0.5];
+let secsPerChart = 2;
+$("speed").addEventListener("input", e => {
+  secsPerChart = SPEEDS[+e.target.value - 1];
+  $("speedLabel").textContent = `每局 ${secsPerChart} 秒`;
+});
 $("stopBtn").addEventListener("click", () => { setSpin(false); goLevel(Math.round(level)); });
-["modeSel","setSel","tgZw","tgTf","tgBridge","tgMirror","tgCross","tgHalf","tgNames"].forEach(id => $(id).addEventListener("change", draw));
+["modeSel","setSel","trailSel","tgZw","tgTf","tgBridge","tgMirror","tgCross","tgHalf","tgNames"].forEach(id => $(id).addEventListener("change", draw));
 document.addEventListener("keydown", e => {
   if(e.target.closest("input,select,button")) return;
   if(e.key === " "){ e.preventDefault(); setFlow(!flowing); }
@@ -547,7 +589,7 @@ let last = 0;
 function tick(now){
   const dt = Math.min(50, now - last);
   if(flowing){
-    level = (level + dt * 0.0005) % 12;          /* 約 2 秒走一局 */
+    level = (level + dt / (secsPerChart * 1000)) % 12;
     $("lvl").value = Math.round(level) % 12; updatePanel();
   }
   if(spinning && !pointers.size) yaw += dt * 0.00012;
