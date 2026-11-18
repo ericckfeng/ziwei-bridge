@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>雙星系螺旋</title>
+<title>雙星系環面</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;900&family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet">
@@ -37,7 +37,8 @@ header a{color:var(--gold)}
 }
 @media(max-width:900px){.layout{grid-template-columns:minmax(0,1fr)}}
 .stage{background:var(--card-bg);border:1px solid var(--line);border-radius:18px;padding:12px 12px 8px}
-canvas{display:block;width:100%;aspect-ratio:1/1.05;touch-action:none;cursor:grab}
+canvas{display:block;width:100%;aspect-ratio:4/3;touch-action:none;cursor:grab}
+canvas.tall{aspect-ratio:1/1.05}
 canvas:active{cursor:grabbing}
 .ctlrow{display:flex;flex-wrap:wrap;gap:9px;align-items:center;padding:10px 4px 4px;font-size:12.5px}
 .ctlrow.sep{border-top:1px solid var(--line);margin-top:6px;padding-top:12px}
@@ -73,14 +74,19 @@ footer a{color:var(--gold)}
 <button id="themeBtn" class="theme-btn" aria-label="切換日夜配色">☀ 日間</button>
 
 <header>
-  <h1>紫微・天府 <span>雙星系螺旋</span></h1>
-  <p>把十二張盤依局數疊成一圈　·　<a href="index.html">回拓撲盤</a></p>
+  <h1>紫微・天府 <span>雙星系環面</span></h1>
+  <p>十二張盤依局數接成一個環面，頭尾相接、循環不息　·　<a href="index.html">回拓撲盤</a></p>
 </header>
 
 <div class="layout">
   <div class="stage">
-    <canvas id="cv" aria-label="雙星系螺旋立體圖，可拖曳旋轉"></canvas>
+    <canvas id="cv" aria-label="雙星系環面與螺旋立體圖，可拖曳旋轉"></canvas>
     <div class="ctlrow sep">
+      <label>形狀</label>
+      <select id="shapeSel">
+        <option value="torus">環面（頭尾相接）</option>
+        <option value="cyl">圓柱（攤開一圈）</option>
+      </select>
       <label>模式</label>
       <select id="modeSel">
         <option value="braid">麻花（實際宮位）</option>
@@ -99,7 +105,7 @@ footer a{color:var(--gold)}
       <label>標示局數</label>
       <input type="range" id="lvl" min="0" max="11" step="1" value="0">
       <span id="lvlLabel" style="color:var(--gold)">紫微在子</span>
-      <button id="playBtn">▶ 逐局</button>
+      <button id="playBtn">▶ 永動</button>
     </div>
     <div class="toggles">
       <label><input type="checkbox" id="tgZw" checked><span class="sw" style="background:var(--zw)"></span>紫微系</label>
@@ -120,9 +126,10 @@ footer a{color:var(--gold)}
     <div class="card">
       <h2>怎麼讀這張圖</h2>
       <ul>
-        <li><b>圓周</b>是十二地支（子在正前方，與拓撲盤同向）；<b>高度</b>是局數，也就是紫微所在宮，由下而上從子到亥，最上一層回到子。十二局是循環的，所以兩端其實相接，完整形狀是環面。</li>
+        <li><b>環面</b>（預設）：繞著管子的一圈是十二地支，沿著大圓的一圈是局數（紫微所在宮）。十二局循環，亥之後回到子，所以把圓柱的頭尾接起來，就是這個結構真正的形狀。管子外緣的小字是局數，金色細圈是目前標示的那一局。</li>
+        <li><b>圓柱</b>：把環面從「紫微在子」剪開攤平。圓周是十二地支（子在正前方，與拓撲盤同向），高度由下而上從子到亥，最上一層回到子。</li>
         <li><b>每條曲線</b>是一顆主星走過十二局的軌跡：紫微系隨局數順時針前進，天府系逆時針後退，各轉一整圈。</li>
-        <li>拖曳可旋轉，拉桿可標出任一局；標出的那一層就是拓撲盤上的那一張盤。</li>
+        <li>拖曳可旋轉，拉桿可標出任一局；標出的那一層就是拓撲盤上的那一張盤。按「永動」，標示圈會沿著環面連續流動，十四顆星沿各自的軌道滑行，一圈之後回到原點，週而復始。</li>
         <li><b>兩股</b>：每一系是剛體，整串星一起轉，所以一系就是一股。選「只看兩主星」時，紫微與天府各代表一股；在雙股模式下，兩股同向旋轉、相位恆差三宮，就是標準的雙螺旋。</li>
       </ul>
     </div>
@@ -130,6 +137,7 @@ footer a{color:var(--gold)}
       <h2>圖中可見的定理</h2>
       <ul>
         <li><b>麻花</b>：兩系反向纏繞，同系的星永不交會（位差恆定），異系兩星每圈恰好交會兩次。</li>
+        <li><b>交會數是拓撲不變量</b>：在環面上，紫微系每條軌道繞大圓一圈、繞管子一圈；天府系繞大圓一圈、反向繞管子一圈。這兩類閉曲線的交點數等於 |1×(−1) − 1×1| = 2，不論怎麼連續變形都不會改變——「同宮兩局」因此不是巧合，而是環面上的必然。</li>
         <li><b>同宮兩局</b>：位置和為偶數的異系星對，交會點正好落在某一局，即十二局中同宮兩局（2:4:2:4律）。</li>
         <li><b>互斥定理</b>：五對暗合星也會交會，但交會點都在兩局之間（半局），所以任何一張實際的盤都不同宮；它們在每一局都由一根暗合梯級連著。</li>
         <li><b>雙股模式</b>：把天府系經暗合鏡射（宮位 x → 1 − x）後畫在內圈，兩系變成同向旋轉，五對暗合星正好上下對齊，梯級成為水平的「鹼基對」：廉貞—天梁、天同—貪狼、武曲—太陰、太陽—天府、天機—破軍。</li>
@@ -140,7 +148,7 @@ footer a{color:var(--gold)}
   </div>
 </div>
 
-<footer>雙星系螺旋 · 與 <a href="index.html">十四主星拓撲盤</a> 共用同一套安星公式</footer>
+<footer>雙星系環面 · 與 <a href="index.html">十四主星拓撲盤</a> 共用同一套安星公式</footer>
 
 <script>
 (function(){
@@ -163,17 +171,29 @@ const $ = id => document.getElementById(id);
 const on = id => $(id).checked;
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-let yaw = -0.35, pitch = 0.32, spinning = !reduceMotion, level = 0, playing = null;
+let yaw = -0.25, pitch = 0.55, spinning = !reduceMotion, level = 0, flowing = false, shape = "torus";
 let W = 0, H = 0, DPR = 1;
 
 /* 宮位（連續）→ 圓周角：子在正前方，順序與拓撲盤一致 */
-function world(series, name, s, mode){
-  let ang, r = 1;
-  if(series === "zw") ang = s + ZW_OFF[name];
-  else if(mode === "braid") ang = 4 - s + TF_OFF[name];
-  else { ang = 1 - (4 - s + TF_OFF[name]); r = 0.6; }   /* 暗合鏡射 x → 1 − x */
+function angRf(series, name, s, mode){
+  if(series === "zw") return [s + ZW_OFF[name], 1];
+  if(mode === "braid") return [4 - s + TF_OFF[name], 1];
+  return [1 - (4 - s + TF_OFF[name]), 0.6];   /* 暗合鏡射 x → 1 − x，畫在內圈 */
+}
+/* 局數 s、宮位角 ang（以宮為單位）、半徑係數 rf → 三維座標
+   圓柱：圓周 = 宮位，高度 = 局數；環面：繞管 = 宮位，繞大圓 = 局數 */
+function geo(s, ang, rf){
   const phi = ang * Math.PI / 6;
-  return [r * Math.sin(phi), (s - 6) / 6 * 1.25, r * Math.cos(phi)];
+  if(shape === "cyl") return [rf*Math.sin(phi), (s - 6) / 6 * 1.25, rf*Math.cos(phi)];
+  /* 環面拉長成橢圓環：中心線 (A sin u, 0, B cos u)，管截面沿外法向 N 與垂直方向展開 */
+  const u = s * Math.PI / 6, A = 2.8, B = 1.5, tr = 0.78 * rf;
+  const nx = B*Math.sin(u), nz = A*Math.cos(u), nl = Math.hypot(nx, nz);
+  const out = tr*Math.cos(phi);
+  return [A*Math.sin(u) + out*nx/nl, tr*Math.sin(phi), B*Math.cos(u) + out*nz/nl];
+}
+function world(series, name, s, mode){
+  const [ang, rf] = angRf(series, name, s, mode);
+  return geo(s, ang, rf);
 }
 function project(p){
   let [x,y,z] = p;
@@ -181,10 +201,10 @@ function project(p){
   [x, z] = [x*cy + z*sy, -x*sy + z*cy];
   const cp = Math.cos(pitch), sp = Math.sin(pitch);
   [y, z] = [y*cp - z*sp, y*sp + z*cp];
-  const k = 10 / (10 - z), sc = Math.min(W, H) * 0.29;
+  const k = 12 / (12 - z), sc = shape === "cyl" ? Math.min(W, H) * 0.29 : Math.min(W / 8.2, H / 4.3);
   return {X: W/2 + x*k*sc, Y: H*0.5 - y*k*sc, z};
 }
-const alphaOf = z => Math.max(0.25, Math.min(1, 0.3 + 0.7 * (z + 1.6) / 3.2));
+const alphaOf = z => { const span = shape === "cyl" ? 1.6 : 2.0; return Math.max(0.22, Math.min(1, 0.3 + 0.7 * (z + span) / (2*span))); };
 
 function css(name){ return getComputedStyle(document.body).getPropertyValue(name).trim(); }
 
@@ -213,21 +233,20 @@ function draw(){
       ctx.fillText(str, P.X, P.Y); }});
   };
 
-  /* 上下底圈與地支 */
-  for(const s of [0,12]){
-    for(let i=0;i<48;i++){
-      const a0 = i/4, a1 = (i+1)/4;
-      const p = t => { const phi = t*Math.PI/6; return [Math.sin(phi),(s-6)/6*1.25,Math.cos(phi)]; };
-      seg(p(a0), p(a1), C.line, 1, [], 0.6);
-    }
+  /* 骨架：圓柱的上下底圈與中軸；環面的「紫微在子」切口圈與外緣局數 */
+  const ring = (s0, rf, col, w, am) => { for(let i=0;i<48;i++) seg(geo(s0,i/4,rf), geo(s0,(i+1)/4,rf), col, w, [], am); };
+  if(shape === "cyl"){
+    ring(0, 1, C.line, 1, 0.6); ring(12, 1, C.line, 1, 0.6);
+    seg([0,-1.25,0],[0,1.25,0], C.line, 1, [2,4], 0.8);
+    for(let s0=0;s0<=12;s0++) text([0,(s0-6)/6*1.25,0], s0===12 ? "子" : BR[s0], C.dim, 10, 400);
+  } else {
+    ring(0, 1, C.line, 1, 0.7);
+    for(let i=0;i<96;i++) seg(geo(i/8, 0, 1), geo((i+1)/8, 0, 1), C.line, 1, [2,5], 0.5);   /* 外赤道 */
+    for(let i=0;i<96;i++) seg(geo(i/8, 6, 1), geo((i+1)/8, 6, 1), C.line, 1, [2,5], 0.4);   /* 內赤道 */
+    for(let s0=0;s0<12;s0++) text(geo(s0, -3, 1.45), "紫微在" + BR[s0], C.dim, 10, 400);
   }
-  for(let i=0;i<12;i++){
-    const phi = i*Math.PI/6;
-    text([1.34*Math.sin(phi), -1.25, 1.34*Math.cos(phi)], BR[i], i%2 ? css("--dim") : C.gold, 13, 600);
-  }
-  /* 中軸與局數刻度 */
-  seg([0,-1.25,0],[0,1.25,0], C.line, 1, [2,4], 0.8);
-  for(let s=0;s<=12;s++) text([0,(s-6)/6*1.25,0], s===12 ? "子" : BR[s], C.dim, 10, 400);
+  /* 地支：圓柱標在底圈；環面標在左端（紫微在酉、戌之間）正對鏡頭的截面上 */
+  for(let i=0;i<12;i++) text(shape === "cyl" ? geo(0, i, 1.34) : geo(9.5, i, 1.32), BR[i], i%2 ? C.dim : C.gold, 12, 600);
 
   /* 星軌 */
   const STEP = 0.05;
@@ -240,7 +259,7 @@ function draw(){
     let prev = world(sr, n, 0, mode);
     for(let s = STEP; s <= 12 + 1e-9; s += STEP){
       const cur = world(sr, n, s, mode);
-      seg(prev, cur, col, 2.2);
+      seg(prev, cur, col, 1.25);
       prev = cur;
     }
   });
@@ -249,9 +268,9 @@ function draw(){
   const both = on("tgZw") && on("tgTf");
   for(let s=0;s<=12;s++){
     if(both && on("tgBridge")) BRIDGES.filter(([z,f]) => vis(z) && vis(f)).forEach(([z,f]) =>
-      seg(world("zw",z,s,mode), world("tf",f,s,mode), C.anhe, s===level?2.4:1.3, [5,4], s===level?1:0.75));
+      seg(world("zw",z,s,mode), world("tf",f,s,mode), C.anhe, 0.8, [4,4], 0.6));
     if(both && on("tgMirror")) MIRRORS.filter(([z,f]) => vis(z) && vis(f)).forEach(([z,f]) =>
-      seg(world("zw",z,s,mode), world("tf",f,s,mode), C.mirror, 1.1, [2,4], 0.7));
+      seg(world("zw",z,s,mode), world("tf",f,s,mode), C.mirror, 0.8, [2,4], 0.6));
   }
   /* 交會點（只在麻花模式有意義） */
   if(mode === "braid" && both){
@@ -259,30 +278,31 @@ function draw(){
       const s = k/2;
       ZW.filter(vis).forEach(z => TF.filter(vis).forEach(f => {
         const a = world("zw",z,s,mode), b = world("tf",f,s,mode);
-        if(Math.hypot(a[0]-b[0], a[2]-b[2]) > 1e-6) return;
+        if(Math.hypot(a[0]-b[0], a[1]-b[1], a[2]-b[2]) > 1e-6) return;
         const bridged = mod12(ZW_OFF[z] + TF_OFF[f] + 4) === 1;
-        if(k%2 === 0 && on("tgCross")) dot(a, C.gold, 3.4);
-        if(k%2 === 1 && bridged && on("tgHalf")) dot(a, C.anhe, 4.2, true);
+        if(k%2 === 0 && on("tgCross")) dot(a, C.gold, 2.6);
+        if(k%2 === 1 && bridged && on("tgHalf")) dot(a, C.anhe, 3.2, true);
       }));
     }
   }
-  /* 標示層 */
-  for(let i=0;i<48;i++){
-    const p = t => { const phi = t*Math.PI/6; return [Math.sin(phi),(level-6)/6*1.25,Math.cos(phi)]; };
-    seg(p(i/4), p((i+1)/4), C.gold, 1.6, [], 1);
-  }
+  /* 標示層（可為連續局數） */
+  ring(level, 1, C.gold, 1.1, 1);
+  if(both && on("tgBridge")) BRIDGES.filter(([z,f]) => vis(z) && vis(f)).forEach(([z,f]) =>
+    seg(world("zw",z,level,mode), world("tf",f,level,mode), C.anhe, 1.6, [4,3], 1));
   series.forEach(([sr, n, col]) => {
-    const p = world(sr, n, level, mode);
-    dot(p, col, 4.6);
-    if(on("tgNames")) text([p[0]*(sr==="zw"?1.13:(mode==="dna"?0.78:1.13)), p[1]+0.07, p[2]*(sr==="zw"?1.13:(mode==="dna"?0.78:1.13))], n, col, 11.5, 600);
+    const [ang, rf] = angRf(sr, n, level, mode);
+    dot(geo(level, ang, rf), col, 3.8);
+    if(on("tgNames")) text(geo(level, ang, rf === 1 ? 1.2 : 0.72), n, col, 11.5, 600);
   });
 
   prims.sort((a,b) => a.z - b.z).forEach(p => p.f());
   ctx.globalAlpha = 1; ctx.setLineDash([]);
 }
 
+let shownT = -1;
 function levelInfo(){
-  const t = level, pos = {};
+  const t = Math.round(level) % 12, pos = {};
+  if(t === shownT) return; shownT = t;
   ZW.forEach(n => pos[n] = mod12(t + ZW_OFF[n]));
   TF.forEach(n => pos[n] = mod12(4 - t + TF_OFF[n]));
   const same = [];
@@ -317,18 +337,23 @@ cv.addEventListener("pointercancel", () => drag = null);
 
 function setSpin(v){ spinning = v; $("spinBtn").classList.toggle("on", v); }
 $("spinBtn").addEventListener("click", () => setSpin(!spinning));
-$("resetBtn").addEventListener("click", () => { yaw = 0; pitch = 0.32; draw(); });
-$("lvl").addEventListener("input", e => { level = +e.target.value; levelInfo(); draw(); });
-$("playBtn").addEventListener("click", () => {
-  if(playing){ clearInterval(playing); playing = null; $("playBtn").classList.remove("on"); return; }
-  $("playBtn").classList.add("on");
-  playing = setInterval(() => { level = (level + 1) % 12; $("lvl").value = level; levelInfo(); draw(); }, 1400);
-});
+const defaultPitch = () => shape === "cyl" ? 0.32 : 0.55;
+$("resetBtn").addEventListener("click", () => { yaw = 0; pitch = defaultPitch(); draw(); });
+$("shapeSel").addEventListener("change", e => { shape = e.target.value; pitch = defaultPitch(); cv.classList.toggle("tall", shape === "cyl"); resize(); });
+$("lvl").addEventListener("input", e => { setFlow(false); level = +e.target.value; levelInfo(); draw(); });
+function setFlow(v){ flowing = v; $("playBtn").classList.toggle("on", v); $("playBtn").textContent = v ? "❚❚ 暫停" : "▶ 永動"; }
+$("playBtn").addEventListener("click", () => setFlow(!flowing));
 ["modeSel","setSel","tgZw","tgTf","tgBridge","tgMirror","tgCross","tgHalf","tgNames"].forEach(id => $(id).addEventListener("change", draw));
 
 let last = 0;
 function tick(now){
-  if(spinning && !drag){ yaw += Math.min(50, now - last) * 0.00025; draw(); }
+  const dt = Math.min(50, now - last);
+  if(flowing){
+    level = (level + dt * 0.0005) % 12;          /* 約 2 秒走一局 */
+    $("lvl").value = Math.floor(level); levelInfo();
+  }
+  if(spinning && !drag) yaw += dt * 0.00012;
+  if(flowing || (spinning && !drag)) draw();
   last = now; requestAnimationFrame(tick);
 }
 
@@ -346,6 +371,7 @@ setTheme(saved ? saved === "light" : matchMedia("(prefers-color-scheme: light)")
 themeBtn.addEventListener("click", () => setTheme(!document.body.classList.contains("light"), true));
 
 setSpin(spinning);
+setFlow(!reduceMotion);
 window.addEventListener("resize", resize);
 levelInfo(); resize();
 if(document.fonts && document.fonts.ready) document.fonts.ready.then(draw);
