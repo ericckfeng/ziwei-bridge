@@ -125,7 +125,7 @@ footer a{color:var(--gold)}
       <select id="trailSel">
         <option value="all">全部顯示</option>
         <option value="sel">只顯示選定星</option>
-        <option value="none">隱藏（只看星點）</option>
+        <option value="none">隱藏（只留本局星點與連線）</option>
       </select>
     </div>
     <div class="ctlrow">
@@ -149,6 +149,9 @@ footer a{color:var(--gold)}
       <span id="lvlLabel" style="color:var(--gold)">紫微在子</span>
       <button id="playBtn">▶ 永動</button>
       <button id="stopBtn">■ 停止</button>
+      <label for="speed">速度</label>
+      <input type="range" id="speed" min="1" max="9" step="1" value="5">
+      <span id="speedLabel" style="color:var(--dim)">每局 2 秒</span>
     </div>
     <div class="toggles">
       <label><input type="checkbox" id="tgZw" checked><span class="sw" style="background:var(--zw)"></span>紫微系</label>
@@ -178,7 +181,7 @@ footer a{color:var(--gold)}
         <li><b>環面</b>（預設）：繞著管子的一圈是十二地支，沿著大圓的一圈是局數（紫微所在宮）。十二局循環，亥之後回到子，所以把圓柱的頭尾接起來，就是這個結構真正的形狀。管子外緣的小字是局數，金色細圈是目前標示的那一局。</li>
         <li><b>圓柱</b>：把環面從「紫微在子」剪開攤平。圓周是十二地支（子在正前方，與拓撲盤同向），高度由下而上從子到亥，最上一層回到子。</li>
         <li><b>每條曲線</b>是一顆主星走過十二局的軌跡：紫微系隨局數順時針前進，天府系逆時針後退，各轉一整圈。</li>
-        <li><b>看不清時</b>：按「全螢幕」把立體圖放到最大；「星軌」可改為只顯示選定星，或全部隱藏只看星點。</li>
+        <li><b>看不清時</b>：按「全螢幕」把立體圖放到最大；「星軌」可改為只顯示選定星，或全部隱藏——隱藏時仍保留目前這一局的星點、標示圈、暗合梯級與選定星的關係連線。「速度」拉桿調整永動時每一局停留的秒數。</li>
         <li><b>操作</b>：拖曳旋轉；滾輪或雙指縮放；「視角」按鈕可直接切到正面、斜上、俯視、側面、仰視。「跟隨本局」會讓鏡頭追著目前那一局，放大並正對它的截面——這個截面就是一張十二宮圓盤，永動時可以看著十四顆星在盤上轉動。拖曳畫面即離開跟隨。</li>
         <li><b>永動與停止</b>：按「永動」，標示圈沿環面連續流動，十四顆星沿各自的軌道滑行，一圈之後回到原點。「暫停」停在當下的位置（可能在兩局之間）；「停止」會停在最接近的完整一局；◀ ▶ 逐局前後走。</li>
         <li><b>看相對位置</b>：點立體圖上的任一顆星，或點右側現況盤裡的星名，即可選定這顆星，看它在這一局的同宮、三合、對宮、暗合與夾。</li>
@@ -358,7 +361,7 @@ function draw(){
     let prev = world(sr, n, 0, mode);
     for(let s = STEP; s <= 12 + 1e-9; s += STEP){
       const cur = world(sr, n, s, mode);
-      seg(prev, cur, col, n === selected ? 2.2 : 1.1, [], n === selected ? 1 : 0.6 * fade(n));
+      seg(prev, cur, col, n === selected ? 2.2 : 1.1, [], n === selected ? 1 : (selected || following ? 0.4 : 0.6));
       prev = cur;
     }
   });
@@ -538,9 +541,17 @@ $("spinBtn").addEventListener("click", () => { setSpin(!spinning); if(spinning) 
 $("zoomIn").addEventListener("click", () => { zoom = Math.min(3.5, zoom * 1.2); draw(); });
 $("zoomOut").addEventListener("click", () => { zoom = Math.max(0.5, zoom / 1.2); draw(); });
 const stage = document.querySelector(".stage");
+let fsPending = false;
 $("fsBtn").addEventListener("click", () => {
-  if(document.fullscreenElement) document.exitFullscreen();
-  else if(stage.requestFullscreen) stage.requestFullscreen().catch(() => {});
+  if(fsPending) return;                       /* 切換進行中，忽略連點 */
+  fsPending = true; $("fsBtn").disabled = true;
+  const done = () => { fsPending = false; $("fsBtn").disabled = false; };
+  if(document.fullscreenElement) document.exitFullscreen().catch(() => {}).finally(done);
+  else stage.requestFullscreen().catch(() => {
+    $("fsBtn").textContent = "⛶ 無法全螢幕";
+    $("fsBtn").title = "瀏覽器拒絕了全螢幕（例如頁面被嵌入或權限不足）";
+    setTimeout(() => { if(!document.fullscreenElement) $("fsBtn").textContent = "⛶ 全螢幕"; }, 2500);
+  }).finally(done);
 });
 document.addEventListener("fullscreenchange", () => {
   $("fsBtn").textContent = document.fullscreenElement ? "⛶ 離開全螢幕" : "⛶ 全螢幕";
@@ -558,6 +569,13 @@ $("lvl").addEventListener("input", e => goLevel(+e.target.value));
 $("prevBtn").addEventListener("click", () => goLevel(Math.ceil(level - 1e-6) - 1));
 $("nextBtn").addEventListener("click", () => goLevel(Math.floor(level + 1e-6) + 1));
 $("playBtn").addEventListener("click", () => setFlow(!flowing));
+/* 速度：每一局停留的秒數 */
+const SPEEDS = [8, 6, 4, 3, 2, 1.5, 1, 0.7, 0.5];
+let secsPerChart = 2;
+$("speed").addEventListener("input", e => {
+  secsPerChart = SPEEDS[+e.target.value - 1];
+  $("speedLabel").textContent = `每局 ${secsPerChart} 秒`;
+});
 $("stopBtn").addEventListener("click", () => { setSpin(false); goLevel(Math.round(level)); });
 ["modeSel","setSel","trailSel","tgZw","tgTf","tgBridge","tgMirror","tgCross","tgHalf","tgNames"].forEach(id => $(id).addEventListener("change", draw));
 document.addEventListener("keydown", e => {
@@ -571,7 +589,7 @@ let last = 0;
 function tick(now){
   const dt = Math.min(50, now - last);
   if(flowing){
-    level = (level + dt * 0.0005) % 12;          /* 約 2 秒走一局 */
+    level = (level + dt / (secsPerChart * 1000)) % 12;
     $("lvl").value = Math.round(level) % 12; updatePanel();
   }
   if(spinning && !pointers.size) yaw += dt * 0.00012;
