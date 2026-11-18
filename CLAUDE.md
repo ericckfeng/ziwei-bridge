@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-紫微斗數十四主星拓撲盤 — an interactive SVG visualization of Zi Wei Dou Shu (紫微斗數) star topology on the cyclic group Z₁₂. The entire application is a **single self-contained `index.html`** (inline CSS + vanilla JS, no dependencies, no build step) designed for direct GitHub Pages deployment.
+紫微斗數十四主星拓撲盤 — an interactive SVG visualization of Zi Wei Dou Shu (紫微斗數) star topology on the cyclic group Z₁₂. The entire application is a **single self-contained `index.html`** (inline CSS + vanilla JS, no dependencies, no build step) designed for direct GitHub Pages deployment. A second self-contained page, `helix.html`, draws the twelve charts as a 3D torus (chart number around the long ring, palace around the tube, ends joined; a cylinder view cuts it open) with a continuously flowing chart marker, view presets, zoom, a follow camera that faces the current chart's cross-section, a 2D 現況盤 of the nearest chart, and click-to-select relations (同宮・三合・對宮・暗合・夾) for any star (canvas, drag to rotate); it duplicates the `ZW_OFF` / `TF_OFF` tables, so keep both files in sync if the offsets ever change.
 
 UI text and domain terminology are in Traditional Chinese (zh-TW). Respond to the user in zh-TW.
 
